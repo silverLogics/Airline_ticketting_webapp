@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request  # importing the render_template function
+from flask import Flask, render_template, request, session, url_for, redirect  # importing the render_template function
 import pymysql
 
 app = Flask(__name__)
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 #Configure MySQL
 conn = pymysql.connect(host='localhost', user='root', password='', db='finalairline',
                        charset='utf8mb4',
@@ -38,15 +39,29 @@ def loginAuth():
     
     if(data):
 
-      #session['email'] = email
+      session['email'] = email
       if usertype == 'staff':
         return render_template('login.html') #redirect to staff home page
       elif usertype == 'customer':
-        return render_template('logsuccess.html') #redirect to customer home page
+        return redirect(url_for('loadcustomerdata')) #redirect to customer home page
       
     else:
       error = 'Invalid login or username'
       return render_template('login.html')
+      
+      
+@app.route('/loadcustomerdata')
+def loadcustomerdata():
+  email = session['email']
+  cursor = conn.cursor();
+  query = 'SELECT purchase.t_id, Ticket.airline_operator, ticket.flight_num FROM purchase, Ticket, Flight WHERE purchase.t_id = Ticket.t_id AND Ticket.airline_operator = Flight.airline_operator AND Ticket.flight_num = Flight.flight_num AND Flight.dept_datetime > curdate() AND purchase.email = %s'
+  cursor.execute(query, (email))
+  data = cursor.fetchall()
+  cursor.close()
+  return render_template('customerhome.html', email=email, ticketinfo=data)
+      
+      
+
 
 
 @app.route('/registerCustomer')
@@ -92,3 +107,4 @@ def AuthCustomer():
     return render_template('startpage.html')
 
 app.run(debug = True)
+

@@ -1,11 +1,9 @@
 from flask import Flask, render_template, request  # importing the render_template function
+import pymysql
 
 app = Flask(__name__)
 #Configure MySQL
-conn = pymysql.connect(host='localhost',
-                       user='root',
-                       password='',
-                       db='air_ticket_reservations',
+conn = pymysql.connect(host='127.0.0.1', unix_socket='/Applications/XAMPP/xamppfiles/var/mysql/finalairline', password='', db='final airline',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
     # database name is 'air_ticket_reservations'
@@ -25,23 +23,18 @@ def loginAuth():
     username = request.form['username']
     password = request.form['password']
     usrtype = request.form['usrtype']
-
-    #cursor used to send queries
-	cursor = conn.cursor()
-    
+    cursor = conn.cursor()
     if usrtype == 'staff':
       query = 'SELECT * FROM airline_staff WHERE username = %s and password = md5(%s)'
     elif usrtype == 'customer':
       query = 'SELECT * FROM customer WHERE email = %s and password = md5(%s)'
     
     cursor.execute(query, (username, password))
-	#stores the results in a variable
+    #stores the results in a variable
     # data = result of query
-	data = cursor.fetchone()
-    #use fetchall() if you are expecting more than 1 data row
-	
+    data = cursor.fetchone()
     cursor.close()
-	error = None
+    error = None
     
     if(data):
 
@@ -94,8 +87,8 @@ def AuthCustomer():
     ins = 'INSERT INTO customer VALUES(%s, %s, %s, %d, %s, %s, %s, %s, %s, %s, %s, %s)'
     #insert query
     cursor.execute(ins, (username, password))
-	conn.commit()
-	cursor.close()
+    conn.commit()
+    cursor.close()
     return render_template('index.html')
 
 app.run(debug = True)

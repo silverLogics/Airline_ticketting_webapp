@@ -1,0 +1,21 @@
+<html>
+<body>
+<h2>Enter your login information</h2>
+<form action="/loginAuth" method="POST">
+  Email <br><input type="text" name="email" placeholder="email" required/> </br><br>
+  Password <br><input type="password" name="pswd" placeholder="psswd" required/></br><br>
+  State how you wish to login <br>
+  <input type="radio" name="type" value="customer" required> Customer
+  <input type="radio" name="type" value="staff"> Airline Staff <br><br>
+  <input type="submit" value = Login />
+  {% if error %}
+    <p class="error"><strong>Error:</strong> {{error}}</p>
+  {% endif %}
+</form>
+
+<a href="/">Return</a>
+
+</body>
+
+
+</html>

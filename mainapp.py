@@ -33,8 +33,6 @@ def loginAuth():
       query = 'SELECT * FROM airline_staff WHERE username = %s and password = md5(%s)'
     elif usrtype == 'customer':
       query = 'SELECT * FROM customer WHERE email = %s and password = md5(%s)'
-    else:
-      query = 'SELECT * FROM booking_agent WHERE email = %s and password = md5(%s)'
     
     cursor.execute(query, (username, password))
 	#stores the results in a variable

@@ -1,6 +1,15 @@
 from flask import Flask, render_template, request  # importing the render_template function
 
 app = Flask(__name__)
+#Configure MySQL
+conn = pymysql.connect(host='localhost',
+                       user='root',
+                       password='',
+                       db='air_ticket_reservations',
+                       charset='utf8mb4',
+                       cursorclass=pymysql.cursors.DictCursor)
+    # database name is 'air_ticket_reservations'
+
 # home route
 @app.route("/")
 def hello():
@@ -17,16 +26,25 @@ def loginAuth():
     password = request.form['password']
     usrtype = request.form['usrtype']
 
+    #cursor used to send queries
+	cursor = conn.cursor()
+    
     if usrtype == 'staff':
       query = 'SELECT * FROM airline_staff WHERE username = %s and password = md5(%s)'
     elif usrtype == 'customer':
       query = 'SELECT * FROM customer WHERE email = %s and password = md5(%s)'
     else:
       query = 'SELECT * FROM booking_agent WHERE email = %s and password = md5(%s)'
-
-    data=None
+    
+    cursor.execute(query, (username, password))
+	#stores the results in a variable
     # data = result of query
-    error = None
+	data = cursor.fetchone()
+    #use fetchall() if you are expecting more than 1 data row
+	
+    cursor.close()
+	error = None
+    
     if(data):
 
       session['username'] = username
@@ -59,15 +77,27 @@ def AuthCustomer():
   passport_country = request.form['passport_country']
   date_of_birth = request.form['date_of_birth']
     
+  #cursor used to send queries
+  cursor = conn.cursor()
+    
   query = 'SELECT * FROM customer WHERE email = %s'
-  #data = execute and get the person
+  cursor.execute(query, (username))
+  #stores the results in a variable
+  # data = result of query
+  data = cursor.fetchone()
+  # use fetchall() if you are expecting more than 1 data row
   error = None
+    
   if(data): #if data exists
     error = "This user already exists"
+    cursor.close()
     return render_template('registerCustomer.html', error = error)
   else:
     ins = 'INSERT INTO customer VALUES(%s, %s, %s, %d, %s, %s, %s, %s, %s, %s, %s, %s)'
     #insert query
+    cursor.execute(ins, (username, password))
+	conn.commit()
+	cursor.close()
     return render_template('index.html')
 
 app.run(debug = True)

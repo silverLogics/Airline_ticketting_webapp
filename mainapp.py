@@ -17,32 +17,32 @@ def hello():
 def login():
   return render_template('login.html')
   
-@app.route('/loginAuth', methods=['GET', 'POST'])
+@app.route('/logAuth', methods=['GET', 'POST'])
 def loginAuth():
     #grabs information from the forms
-    username = request.form['username']
+    email = request.form['email']
     password = request.form['password']
-    usrtype = request.form['usrtype']
+    usertype = request.form['usertype']
     cursor = conn.cursor()
-    if usrtype == 'staff':
-      query = 'SELECT * FROM airline_staff WHERE username = %s and password = md5(%s)'
-    elif usrtype == 'customer':
+    if usertype == 'staff':
+      query = 'SELECT * FROM airline_staff WHERE email = %s and password = md5(%s)'
+    elif usertype == 'customer':
       query = 'SELECT * FROM customer WHERE email = %s and password = md5(%s)'
     
-    cursor.execute(query, (username, password))
+    cursor.execute(query, (email, password))
     #stores the results in a variable
     # data = result of query
     data = cursor.fetchone()
     cursor.close()
-    error = None
+    print(data)
     
     if(data):
 
-      session['username'] = username
-      if usrtype == 'staff':
+      #session['email'] = email
+      if usertype == 'staff':
         return render_template('login.html') #redirect to staff home page
-      elif usrtype == 'customer':
-        return render_template('login.html') #redirect to customer home page
+      elif usertype == 'customer':
+        return render_template('logsuccess.html') #redirect to customer home page
       
     else:
       error = 'Invalid login or username'
@@ -84,7 +84,7 @@ def AuthCustomer():
     cursor.close()
     return render_template('registerCust.html', error = error)
   else:
-    ins = 'INSERT INTO customer VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+    ins = 'INSERT INTO customer VALUES(%s, %s, md5(%s), %s, %s, %s, %s, %s, %s, %s, %s, %s)'
     #insert query
     cursor.execute(ins, (email, name, password, building_number, street, city, state, phone_number, passport_number, passport_expiration, passport_country,DOB))
     conn.commit()

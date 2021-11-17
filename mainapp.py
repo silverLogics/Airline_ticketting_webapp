@@ -3,7 +3,7 @@ import pymysql
 
 app = Flask(__name__)
 #Configure MySQL
-conn = pymysql.connect(host='127.0.0.1', unix_socket='/Applications/XAMPP/xamppfiles/var/mysql/finalairline', password='', db='final airline',
+conn = pymysql.connect(host='localhost', user='root', password='', db='finalairline',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
     # database name is 'air_ticket_reservations'
@@ -66,13 +66,13 @@ def AuthCustomer():
   passport_number = request.form['passport_number']
   passport_expiration = request.form['passport_expiration']
   passport_country = request.form['passport_country']
-  date_of_birth = request.form['date_of_birth']
+  DOB = request.form['date_of_birth']
     
   #cursor used to send queries
   cursor = conn.cursor()
     
   query = 'SELECT * FROM customer WHERE email = %s'
-  cursor.execute(query, (username))
+  cursor.execute(query, (email))
   #stores the results in a variable
   # data = result of query
   data = cursor.fetchone()
@@ -82,13 +82,13 @@ def AuthCustomer():
   if(data): #if data exists
     error = "This user already exists"
     cursor.close()
-    return render_template('registerCustomer.html', error = error)
+    return render_template('registerCust.html', error = error)
   else:
-    ins = 'INSERT INTO customer VALUES(%s, %s, %s, %d, %s, %s, %s, %s, %s, %s, %s, %s)'
+    ins = 'INSERT INTO customer VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
     #insert query
-    cursor.execute(ins, (username, password))
+    cursor.execute(ins, (email, name, password, building_number, street, city, state, phone_number, passport_number, passport_expiration, passport_country,DOB))
     conn.commit()
     cursor.close()
-    return render_template('index.html')
+    return render_template('startpage.html')
 
 app.run(debug = True)

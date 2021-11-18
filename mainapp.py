@@ -43,7 +43,7 @@ def loginAuth():
         session['username'] = email
         return redirect(url_for('loadstaffdata')) #redirect to staff home page
       elif usertype == 'customer':
-        session['email'] = email
+        session['username'] = email
         return redirect(url_for('loadcustomerdata')) #redirect to customer home page
       
     else:
@@ -53,7 +53,7 @@ def loginAuth():
       
 @app.route('/loadcustomerdata')
 def loadcustomerdata():
-  email = session['email']
+  email = session['username']
   cursor = conn.cursor();
   query = 'SELECT purchase.t_id, Ticket.airline_operator, ticket.flight_num FROM purchase, Ticket, Flight WHERE purchase.t_id = Ticket.t_id AND Ticket.airline_operator = Flight.airline_operator AND Ticket.flight_num = Flight.flight_num AND Flight.dept_datetime > curdate() AND purchase.email = %s'
   cursor.execute(query, (email))
@@ -136,8 +136,33 @@ def AuthStaff():
 
 @app.route('/loadstaffdata')
 def loadstaffdata():
-    username = session['email']
+    username = session['username']
     return render_template('staffhome.html', username=username)
 
+
+@app.route('/addAirport')
+def addAirportPage():
+    return render_template('addAirport.html')
+
+@app.route('/addAirportAuth', methods=['POST'])
+def addAirport():
+    id = request.form['airport_id']
+    name = request.form['airport_name']
+    city = request.form['city']
+    
+    cursor = conn.cursor()
+    query = 'insert into airport values (%s, %s, %s)'
+    cursor.execute(query, (id, name, city))
+    conn.commit()
+    cursor.close()
+    
+    return redirect(url_for('loadstaffdata'))
+
+
+
+@app.route('/logout')
+def logout():
+  session.pop('username')
+  return redirect('/login')
 app.run(debug = True)
 

@@ -158,6 +158,24 @@ def addAirport():
     
     return redirect(url_for('loadstaffdata'))
 
+@app.route('/addAirplane')
+def addAirplane():
+    return render_template('addAirplane.html')
+
+@app.route('/addAirplaneAuth', methods=['POST'])
+def addAirplaneAuth():
+    id = request.form['id']
+    owner_name = request.form['owner']
+    seats = request.form['seats']
+    
+    cursor = conn.cursor()
+    query = 'insert into airplane values (%s, %s, %s)'
+    cursor.execute(query, (id, owner_name, seats))
+    conn.commit()
+    cursor.close()
+    
+    return redirect(url_for('loadstaffdata'))
+
 
 
 @app.route('/logout')

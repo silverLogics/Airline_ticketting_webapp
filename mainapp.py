@@ -26,7 +26,7 @@ def loginAuth():
     usertype = request.form['usertype']
     cursor = conn.cursor()
     if usertype == 'staff':
-      query = 'SELECT * FROM airline_staff WHERE email = %s and password = md5(%s)'
+      query = 'SELECT * FROM airline_staff WHERE username = %s and password = md5(%s)'
     elif usertype == 'customer':
       query = 'SELECT * FROM customer WHERE email = %s and password = md5(%s)'
     
@@ -35,14 +35,15 @@ def loginAuth():
     # data = result of query
     data = cursor.fetchone()
     cursor.close()
-    print(data)
+    #print(data)
     
     if(data):
 
-      session['email'] = email
       if usertype == 'staff':
-        return render_template('login.html') #redirect to staff home page
+        session['username'] = email
+        return redirect(url_for('loadstaffdata')) #redirect to staff home page
       elif usertype == 'customer':
+        session['email'] = email
         return redirect(url_for('loadcustomerdata')) #redirect to customer home page
       
     else:
@@ -105,6 +106,38 @@ def AuthCustomer():
     conn.commit()
     cursor.close()
     return render_template('startpage.html')
+
+@app.route('/registerStaff')
+def registerStaff():
+    return render_template('registerStaff.html')
+    
+@app.route('/AuthStaff', methods=['GET', 'POST'])
+def AuthStaff():
+  username = request.form['username']
+  password = request.form['password']
+  f_name = request.form['first_name']
+  l_name = request.form['last_name']
+  DOB = request.form['date_of_birth']
+  airline_name = request.form['airline_name']
+
+  cursor = conn.cursor()
+  query = 'SELECT * FROM airline_staff WHERE username = %s'
+  cursor.execute(query, (username))
+  data = cursor.fetchone()
+  if(data):
+    error = "This user already exists"
+    return render_template('registerStaff.html')
+  else:
+    ins = 'INSERT INTO Airline_staff VALUES(%s, %s, md5(%s), %s, %s, %s)'
+    cursor.execute(ins, (username, airline_name, password, f_name, l_name, DOB))
+    conn.commit()
+    cursor.close()
+    return render_template('startpage.html')
+
+@app.route('/loadstaffdata')
+def loadstaffdata():
+    username = session['email']
+    return render_template('staffhome.html', username=username)
 
 app.run(debug = True)
 

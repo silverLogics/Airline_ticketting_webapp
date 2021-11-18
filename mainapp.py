@@ -176,11 +176,56 @@ def addAirplaneAuth():
     
     return redirect(url_for('loadstaffdata'))
 
+def getStaffAirline():
+    username = session['username']
+    cursor = conn.cursor()
+    query = 'select airline_name from Airline_staff where username = %s'
+    cursor.execute(query, (username))
+    airline = cursor.fetchone()
+    cursor.close()
+    return airline
+    
+@app.route('/createFlight')
+def createFlight():
+    airline = getStaffAirline()
+    
+    cursor = conn.cursor()
+    query = 'select name from airport'
+    cursor.execute(query)
+    airports = cursor.fetchall()
+    
+    query = 'select airplane_id from airplane' #need to specify that the airline that the staff works for is the only airline we want
+    cursor.execute(query, (airline))
+    availableairplane = cursor.fetchall()
+    
+    cursor.close()
+    return render_template('createFlight.html', airports=airports, availableairplane=availableairplane)
+
+@app.route('/createFlightAuth', methods=['POST'])
+def acreateFlightAuth():
+    flightnum = request.form['flightnum']
+    arrivetime = request.form['arrivetime']
+    departtime = request.form['departtime']
+    airline_operator = request.form['airline_operator']
+    owner_name = request.form['owner_airline']
+    departnum = request.form['departnum']
+    arrivenum = request.form['arrivenum']
+    airplane_num = request.form['airplanenum']
+    base_price = request.form['base_price']
+    status = request.form['status']
+    cursor = conn.cursor()
+    query = 'insert into flight values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+    cursor.execute(query, (flightnum, departtime, airline_operator, owner_name, arrivetime, departnum, arrivenum, airplane_num, base_price, status))
+    conn.commit()
+    cursor.close()
+    
+    return redirect(url_for('loadstaffdata'))
 
 
 @app.route('/logout')
 def logout():
   session.pop('username')
   return redirect('/login')
+  
 app.run(debug = True)
 

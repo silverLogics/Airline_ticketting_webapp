@@ -12,6 +12,9 @@
   Date of Birth <br><input type="date" name="date_of_birth" placeholder="date_of_birth" required><br><br>
   Airline Name <br><input type="text" name="airline_name" placeholder="airline_name" required><br><br>
   <input type="submit" value = Register />
+  {% if error %}
+		<p class="error"><strong>Error:</strong> {{error}}</p>
+	{% endif %}
 </form>
 <br><br>
 <a href="/">Return</a>

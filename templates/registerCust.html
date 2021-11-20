@@ -18,6 +18,9 @@
   Passport Country <br><input type="text" name = "passport_country" required/></br><br>
   Date of Birth <br><input type="date" name = "date_of_birth" required/></br><br>
 	<input type="submit" value = Register />
+  {% if error %}
+	<p class="error"><strong>Error:</strong> {{error}}</p>
+  {% endif %}
 </form>
 
 <a href="/">Return</a>

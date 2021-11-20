@@ -195,7 +195,7 @@ def createFlight():
     cursor.execute(query)
     airports = cursor.fetchall()
     
-    query = 'select airplane_id from airplane' #need to specify that the airline that the staff works for is the only airline we want
+    query = 'select airplane_id from airplane where airline_name = %s' #Specified that the airline that the staff works for is the only airline we want?
     cursor.execute(query, (airline))
     availableairplane = cursor.fetchall()
     

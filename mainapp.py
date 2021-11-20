@@ -182,7 +182,7 @@ def getStaffAirline():
     cursor = conn.cursor()
     query = 'select airline_name from Airline_staff where username = %s'
     cursor.execute(query, (username))
-    airline = cursor.fetchone()
+    airline = cursor.fetchone()['airline_name']
     cursor.close()
     return airline
     

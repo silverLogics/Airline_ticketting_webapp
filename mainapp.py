@@ -35,6 +35,7 @@ def loginAuth():
     # data = result of query
     data = cursor.fetchone()
     cursor.close()
+    error = None
     #print(data)
     
     if(data):
@@ -48,7 +49,7 @@ def loginAuth():
       
     else:
       error = 'Invalid login or username'
-      return render_template('login.html')
+      return render_template('login.html', error = error)
       
       
 @app.route('/loadcustomerdata')

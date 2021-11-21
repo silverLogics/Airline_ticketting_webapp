@@ -247,7 +247,11 @@ def searchResult():
     data = cursor.fetchall()
     cursor.close()
     error = None
-    return
+    if (data)
+        return render_template('search.html', results=data)
+    else
+        error = 'Invalid search filters: Please try again'
+        return render_template('search.html', error=error)
 
 @app.route('/logout')
 def logout():

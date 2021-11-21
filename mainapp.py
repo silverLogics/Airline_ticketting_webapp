@@ -42,17 +42,17 @@ def loginAuth():
 
       if usertype == 'staff':
         session['username'] = email
-        return redirect(url_for('loadstaffdata')) #redirect to staff home page
+        return redirect(url_for('staffHome')) #redirect to staff home page
       elif usertype == 'customer':
         session['username'] = email
-        return redirect(url_for('loadcustomerdata')) #redirect to customer home page
+        return redirect(url_for('customerHome')) #redirect to customer home page
       
     else:
       error = 'Invalid login or username'
       return render_template('login.html', error = error)
       
       
-@app.route('/loadcustomerdata')
+@app.route('/customerHome')
 def loadcustomerdata():
   email = session['username']
   cursor = conn.cursor();
@@ -135,7 +135,7 @@ def AuthStaff():
     cursor.close()
     return render_template('startpage.html')
 
-@app.route('/loadstaffdata')
+@app.route('/staffHome')
 def loadstaffdata():
     username = session['username']
     return render_template('staffhome.html', username=username)

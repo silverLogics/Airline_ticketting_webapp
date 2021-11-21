@@ -226,6 +226,28 @@ def createFlightAuth():
     
     return redirect(url_for('staffHome'))
 
+@app.route('/publicSearch')
+def publicSearch():
+    return render_template('search.html')
+
+@app.route('/searchResult', methods=['GET', 'POST'])
+def searchResult():
+    srcName = request.form['srcName']
+    srcCity = request.form['srcCity']
+    dstName = request.form['dstName']
+    departtime = request.form['departtime']
+    arrivetime = request.form['arrivetime']
+    
+    #cursor used to send queries
+    cursor = conn.cursor()
+    #executes query
+    query = 'select * from flight,airport as S, airport as D where date(dept_datetime) <= %s and date(arrive_datetime) <= %s and %s = S.name and %s = D.name and %s = S.city and %s = D.city'
+    cursor.execute(query, (departtime, arrivetime, srcName, dstName, srcCity, dstCity))
+    #stores the results in a variable
+    data = cursor.fetchall()
+    cursor.close()
+    error = None
+    return
 
 @app.route('/logout')
 def logout():

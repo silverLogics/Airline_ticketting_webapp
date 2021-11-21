@@ -241,7 +241,7 @@ def searchResult():
     #cursor used to send queries
     cursor = conn.cursor()
     #executes query
-    query = 'select * from flight,airport as S, airport as D where date(dept_datetime) <= %s and date(arrive_datetime) <= %s and %s = S.name and %s = D.name and %s = S.city and %s = D.city'
+    query = 'select * from flight,airport as S, airport as D where date(dept_datetime) <= %s and date(arrive_datetime) <= %s and %s = S.name and %s = D.name and %s = S.city and %s = D.city and dept_airport_id = S.airport_id and arrive_airport_id = D.airport_id'
     cursor.execute(query, (departtime, arrivetime, srcName, dstName, srcCity, dstCity))
     #stores the results in a variable
     data = cursor.fetchall()

@@ -23,6 +23,24 @@
 </form>
 <!--need to specify the airports and airplanes available to staff-->
 
+<h4> Future Flights by Your Airline Departing in 30 days </h4>
+<style type="text/css">
+	table, th, td{
+		border: 1px solid black;
+	}
+</style>
+<table>
+	<th>Flight Number</th>
+	<th>Departure Time</th>
+
+{% for line in futureFlights %}
+	<tr>
+		<td>{{line['flight_num']}}</td>
+		<td>{{line['dept_datetime']}}</td>
+	</tr>
+{% endfor %}
+</table>
+
 <a href="/staffHome">Go back</a>
 
 </body>

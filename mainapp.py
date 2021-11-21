@@ -7,7 +7,7 @@ app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 conn = pymysql.connect(host='localhost', user='root', password='', db='finalairline',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
-    # database name is 'air_ticket_reservations'
+    # database name is 'finalairline'
 
 # home route
 @app.route("/")
@@ -198,12 +198,16 @@ def createFlight():
     query = 'select airplane_id from airplane where airline_name = %s' #Specified that the airline that the staff works for is the only airline we want?
     cursor.execute(query, (airline))
     availableairplane = cursor.fetchall()
+
+    query = 'select flight_num, dept_datetime from flight where airline_operator = %s and date(dept_datetime) > now() and date(dept_datetime) <= date_add(now(), interval 30 hour)'
+    cursor.execute(query, (airline))
+    futureFlights = cursor.fetchall()
     
     cursor.close()
-    return render_template('createFlight.html', airports=airports, availableairplane=availableairplane)
+    return render_template('createFlight.html', airports=airports, availableairplane=availableairplane, futureFlights=futureFlights)
 
 @app.route('/createFlightAuth', methods=['POST'])
-def acreateFlightAuth():
+def createFlightAuth():
     flightnum = request.form['flightnum']
     arrivetime = request.form['arrivetime']
     departtime = request.form['departtime']

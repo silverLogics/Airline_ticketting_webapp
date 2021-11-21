@@ -157,7 +157,7 @@ def addAirport():
     conn.commit()
     cursor.close()
     
-    return redirect(url_for('loadstaffdata'))
+    return redirect(url_for('staffHome'))
 
 @app.route('/addAirplane')
 def addAirplane():
@@ -175,7 +175,7 @@ def addAirplaneAuth():
     conn.commit()
     cursor.close()
     
-    return redirect(url_for('loadstaffdata'))
+    return redirect(url_for('staffHome'))
 
 def getStaffAirline():
     username = session['username']
@@ -224,7 +224,7 @@ def createFlightAuth():
     conn.commit()
     cursor.close()
     
-    return redirect(url_for('loadstaffdata'))
+    return redirect(url_for('staffHome'))
 
 
 @app.route('/logout')

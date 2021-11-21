@@ -53,7 +53,7 @@ def loginAuth():
       
       
 @app.route('/customerHome')
-def loadcustomerdata():
+def customerHome():
   email = session['username']
   cursor = conn.cursor();
   query = 'SELECT purchase.t_id, Ticket.airline_operator, ticket.flight_num FROM purchase, Ticket, Flight WHERE purchase.t_id = Ticket.t_id AND Ticket.airline_operator = Flight.airline_operator AND Ticket.flight_num = Flight.flight_num AND Flight.dept_datetime > curdate() AND purchase.email = %s'
@@ -136,7 +136,7 @@ def AuthStaff():
     return render_template('startpage.html')
 
 @app.route('/staffHome')
-def loadstaffdata():
+def staffHome():
     username = session['username']
     return render_template('staffhome.html', username=username)
 

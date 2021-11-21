@@ -235,6 +235,7 @@ def searchResult():
     srcName = request.form['srcName']
     srcCity = request.form['srcCity']
     dstName = request.form['dstName']
+    dstCity = request.form['dstCity']
     departtime = request.form['departtime']
     arrivetime = request.form['arrivetime']
     

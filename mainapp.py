@@ -24,42 +24,51 @@ def loginAuth():
     email = request.form['email']
     password = request.form['password']
     usertype = request.form['usertype']
-    cursor = conn.cursor()
-    if usertype == 'staff':
-      query = 'SELECT * FROM airline_staff WHERE username = %s and password = md5(%s)'
-    elif usertype == 'customer':
-      query = 'SELECT * FROM customer WHERE email = %s and password = md5(%s)'
-    
-    cursor.execute(query, (email, password))
-    #stores the results in a variable
-    # data = result of query
-    data = cursor.fetchone()
-    cursor.close()
-    error = None
-    #print(data)
-    
-    if(data):
-
-      if usertype == 'staff':
-        session['username'] = email
-        return redirect(url_for('staffHome')) #redirect to staff home page
-      elif usertype == 'customer':
-        session['username'] = email
-        return redirect(url_for('customerHome')) #redirect to customer home page
-      
-    else:
-      error = 'Invalid login or username'
-      return render_template('login.html', error = error)
-      
+    try:
+        cursor = conn.cursor()
+        if usertype == 'staff':
+            query = 'SELECT * FROM airline_staff WHERE username = %s and password = md5(%s)'
+        elif usertype == 'customer':
+            query = 'SELECT * FROM customer WHERE email = %s and password = md5(%s)'
+        
+        cursor.execute(query, (email, password))
+        #stores the results in a variable
+        # data = result of query
+        data = cursor.fetchone()
+        cursor.close()
+        error = None
+        #print(data)
+        
+        if(data):
+            if usertype == 'staff':
+                session['username'] = email
+                return redirect(url_for('staffHome')) #redirect to staff home page
+            elif usertype == 'customer':
+                session['username'] = email
+                return redirect(url_for('customerHome')) #redirect to customer home page
+        else:
+          error = 'Invalid login or username'
+          return render_template('login.html', error = error)
+    except mysql.conn.Error as e:
+        print("Error reading data from airline_staff or customer table while login", e)
+    finally:
+        cursor.close()
+    error = 'Invalid login attempt. Please try again'
+    return render_template('login.html', error = error)
       
 @app.route('/customerHome')
 def customerHome():
     email = session['username']
-    cursor = conn.cursor();
-    query = 'SELECT purchase.t_id, Ticket.airline_operator, ticket.flight_num FROM purchase, Ticket, Flight WHERE purchase.t_id = Ticket.t_id AND Ticket.airline_operator = Flight.airline_operator AND Ticket.flight_num = Flight.flight_num AND Flight.dept_datetime > curdate() AND purchase.email = %s'
-    cursor.execute(query, (email))
-    data = cursor.fetchall()
-    cursor.close()
+    try:
+        cursor = conn.cursor();
+        query = 'SELECT purchase.t_id, Ticket.airline_operator, ticket.flight_num FROM purchase, Ticket, Flight WHERE purchase.t_id = Ticket.t_id AND Ticket.airline_operator = Flight.airline_operator AND Ticket.flight_num = Flight.flight_num AND Flight.dept_datetime > curdate() AND purchase.email = %s'
+        cursor.execute(query, (email))
+        data = cursor.fetchall()
+        cursor.close()
+    except mysql.conn.Error as e:
+        print("Error reading data from purchase, Ticket, Flight table", e)
+    finally:
+        cursor.close()
     return render_template('customerhome.html', email=email, ticketinfo=data)
       
       
@@ -84,29 +93,41 @@ def AuthCustomer():
     passport_expiration = request.form['passport_expiration']
     passport_country = request.form['passport_country']
     DOB = request.form['date_of_birth']
-    
-    #cursor used to send queries
-    cursor = conn.cursor()
-    
-    query = 'SELECT * FROM customer WHERE email = %s'
-    cursor.execute(query, (email))
-    #stores the results in a variable
-    # data = result of query
-    data = cursor.fetchone()
-    # use fetchall() if you are expecting more than 1 data row
     error = None
-    
+    try:
+        #cursor used to send queries
+        cursor = conn.cursor()
+        query = 'SELECT * FROM customer WHERE email = %s'
+        cursor.execute(query, (email))
+        #stores the results in a variable
+        # data = result of query
+        data = cursor.fetchone()
+        # use fetchall() if you are expecting more than 1 data row
+        error = None
+    except mysql.conn.Error as e:
+        print("Error reading data from customer", e)
+    finally:
+        cursor.close()
+        error = "Error reading data from customer. Please try again"
+        return render_template('registerCust.html', error = error)
     if(data): #if data exists
         error = "This user already exists"
         cursor.close()
         return render_template('registerCust.html', error = error)
     else:
-        ins = 'INSERT INTO customer VALUES(%s, %s, md5(%s), %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-        #insert query
-        cursor.execute(ins, (email, name, password, building_number, street, city, state, phone_number, passport_number, passport_expiration, passport_country,DOB))
-        conn.commit()
-        cursor.close()
-        return render_template('startpage.html')
+        try:
+            ins = 'INSERT INTO customer VALUES(%s, %s, md5(%s), %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+            #insert query
+            cursor.execute(ins, (email, name, password, building_number, street, city, state, phone_number, passport_number, passport_expiration, passport_country,DOB))
+            conn.commit()
+            cursor.close()
+            return render_template('startpage.html')
+        except mysql.conn.Error as e:
+            print("Error writing data into customer", e)
+            cursor.close()
+            error = "Error writing data into customer. Please try again"
+    return render_template('registerCust.html', error = error)
+        
 
 @app.route('/registerStaff')
 def registerStaff():
@@ -120,20 +141,33 @@ def AuthStaff():
     l_name = request.form['last_name']
     DOB = request.form['date_of_birth']
     airline_name = request.form['airline_name']
-
-    cursor = conn.cursor()
-    query = 'SELECT * FROM airline_staff WHERE username = %s'
-    cursor.execute(query, (username))
-    data = cursor.fetchone()
+    error = None
+    try:
+        cursor = conn.cursor()
+        query = 'SELECT * FROM airline_staff WHERE username = %s'
+        cursor.execute(query, (username))
+        data = cursor.fetchone()
+    except mysql.conn.Error as e:
+        print("Error reading data from airline_staff", e)
+    finally:
+        cursor.close()
+        error = "Error reading data from airline_staff. Please try again"
+        return render_template('registerCust.html', error = error)
     if data:
         error = "This user already exists"
         return render_template('registerStaff.html')
     else:
-        ins = 'INSERT INTO Airline_staff VALUES(%s, %s, md5(%s), %s, %s, %s)'
-        cursor.execute(ins, (username, airline_name, password, f_name, l_name, DOB))
-        conn.commit()
-        cursor.close()
-        return render_template('startpage.html')
+        try:
+            ins = 'INSERT INTO Airline_staff VALUES(%s, %s, md5(%s), %s, %s, %s)'
+            cursor.execute(ins, (username, airline_name, password, f_name, l_name, DOB))
+            conn.commit()
+            cursor.close()
+            return render_template('startpage.html')
+        except mysql.conn.Error as e:
+            print("Error writing data into airline_staff", e)
+            cursor.close()
+            error = "Error writing data into airline_staff. Please try again"
+    return render_template('registerCust.html', error = error)
 
 @app.route('/staffHome')
 def staffHome():
@@ -150,13 +184,16 @@ def addAirport():
     id = request.form['airport_id']
     name = request.form['airport_name']
     city = request.form['city']
-    
-    cursor = conn.cursor()
-    query = 'insert into airport values (%s, %s, %s)'
-    cursor.execute(query, (id, name, city))
-    conn.commit()
-    cursor.close()
-    
+    try:
+        cursor = conn.cursor()
+        query = 'insert into airport values (%s, %s, %s)'
+        cursor.execute(query, (id, name, city))
+        conn.commit()
+        cursor.close()
+    except mysql.conn.Error as e:
+        print("Error writing data into airport table", e)
+    finally:
+        cursor.close()
     return redirect(url_for('staffHome'))
 
 @app.route('/addAirplane')
@@ -168,13 +205,16 @@ def addAirplaneAuth():
     id = request.form['id']
     owner_name = request.form['owner']
     seats = request.form['seats']
-    
-    cursor = conn.cursor()
-    query = 'insert into airplane values (%s, %s, %s)'
-    cursor.execute(query, (id, owner_name, seats))
-    conn.commit()
-    cursor.close()
-    
+    try:
+        cursor = conn.cursor()
+        query = 'insert into airplane values (%s, %s, %s)'
+        cursor.execute(query, (id, owner_name, seats))
+        conn.commit()
+        cursor.close()
+    except mysql.conn.Error as e:
+        print("Error inserting data into airplane table", e)
+    finally:
+        cursor.close()
     return redirect(url_for('staffHome'))
 
 def getStaffAirline():
@@ -195,7 +235,7 @@ def getStaffAirline():
 @app.route('/createFlight')
 def createFlight():
     error = None
-    username = session['username']
+    username = session['username']#watch for key errors! ex. if you just type the url/createFlight without logging in
     airline = getStaffAirline()
     if airline is None:
         error = 'Staff has no airline? Please log in again'

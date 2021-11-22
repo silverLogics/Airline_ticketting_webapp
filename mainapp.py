@@ -16,7 +16,7 @@ def hello():
     
 @app.route('/login')
 def login():
-  return render_template('login.html')
+    return render_template('login.html')
   
 @app.route('/logAuth', methods=['GET', 'POST'])
 def loginAuth():
@@ -54,13 +54,13 @@ def loginAuth():
       
 @app.route('/customerHome')
 def customerHome():
-  email = session['username']
-  cursor = conn.cursor();
-  query = 'SELECT purchase.t_id, Ticket.airline_operator, ticket.flight_num FROM purchase, Ticket, Flight WHERE purchase.t_id = Ticket.t_id AND Ticket.airline_operator = Flight.airline_operator AND Ticket.flight_num = Flight.flight_num AND Flight.dept_datetime > curdate() AND purchase.email = %s'
-  cursor.execute(query, (email))
-  data = cursor.fetchall()
-  cursor.close()
-  return render_template('customerhome.html', email=email, ticketinfo=data)
+    email = session['username']
+    cursor = conn.cursor();
+    query = 'SELECT purchase.t_id, Ticket.airline_operator, ticket.flight_num FROM purchase, Ticket, Flight WHERE purchase.t_id = Ticket.t_id AND Ticket.airline_operator = Flight.airline_operator AND Ticket.flight_num = Flight.flight_num AND Flight.dept_datetime > curdate() AND purchase.email = %s'
+    cursor.execute(query, (email))
+    data = cursor.fetchall()
+    cursor.close()
+    return render_template('customerhome.html', email=email, ticketinfo=data)
       
       
 
@@ -68,45 +68,45 @@ def customerHome():
 
 @app.route('/registerCustomer')
 def registerCustomer():
-  return render_template('registerCust.html')
+    return render_template('registerCust.html')
 
 @app.route('/AuthCustomer', methods=['GET', 'POST'])
 def AuthCustomer():
-  email = request.form['email']
-  name = request.form['name']
-  password = request.form['password']
-  building_number = request.form['building_number']
-  street = request.form['street']
-  city = request.form['city']
-  state = request.form['state']
-  phone_number = request.form['phone_number']
-  passport_number = request.form['passport_number']
-  passport_expiration = request.form['passport_expiration']
-  passport_country = request.form['passport_country']
-  DOB = request.form['date_of_birth']
+    email = request.form['email']
+    name = request.form['name']
+    password = request.form['password']
+    building_number = request.form['building_number']
+    street = request.form['street']
+    city = request.form['city']
+    state = request.form['state']
+    phone_number = request.form['phone_number']
+    passport_number = request.form['passport_number']
+    passport_expiration = request.form['passport_expiration']
+    passport_country = request.form['passport_country']
+    DOB = request.form['date_of_birth']
     
-  #cursor used to send queries
-  cursor = conn.cursor()
+    #cursor used to send queries
+    cursor = conn.cursor()
     
-  query = 'SELECT * FROM customer WHERE email = %s'
-  cursor.execute(query, (email))
-  #stores the results in a variable
-  # data = result of query
-  data = cursor.fetchone()
-  # use fetchall() if you are expecting more than 1 data row
-  error = None
+    query = 'SELECT * FROM customer WHERE email = %s'
+    cursor.execute(query, (email))
+    #stores the results in a variable
+    # data = result of query
+    data = cursor.fetchone()
+    # use fetchall() if you are expecting more than 1 data row
+    error = None
     
-  if(data): #if data exists
-    error = "This user already exists"
-    cursor.close()
-    return render_template('registerCust.html', error = error)
-  else:
-    ins = 'INSERT INTO customer VALUES(%s, %s, md5(%s), %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-    #insert query
-    cursor.execute(ins, (email, name, password, building_number, street, city, state, phone_number, passport_number, passport_expiration, passport_country,DOB))
-    conn.commit()
-    cursor.close()
-    return render_template('startpage.html')
+    if(data): #if data exists
+        error = "This user already exists"
+        cursor.close()
+        return render_template('registerCust.html', error = error)
+    else:
+        ins = 'INSERT INTO customer VALUES(%s, %s, md5(%s), %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+        #insert query
+        cursor.execute(ins, (email, name, password, building_number, street, city, state, phone_number, passport_number, passport_expiration, passport_country,DOB))
+        conn.commit()
+        cursor.close()
+        return render_template('startpage.html')
 
 @app.route('/registerStaff')
 def registerStaff():
@@ -114,26 +114,26 @@ def registerStaff():
     
 @app.route('/AuthStaff', methods=['GET', 'POST'])
 def AuthStaff():
-  username = request.form['username']
-  password = request.form['password']
-  f_name = request.form['first_name']
-  l_name = request.form['last_name']
-  DOB = request.form['date_of_birth']
-  airline_name = request.form['airline_name']
+    username = request.form['username']
+    password = request.form['password']
+    f_name = request.form['first_name']
+    l_name = request.form['last_name']
+    DOB = request.form['date_of_birth']
+    airline_name = request.form['airline_name']
 
-  cursor = conn.cursor()
-  query = 'SELECT * FROM airline_staff WHERE username = %s'
-  cursor.execute(query, (username))
-  data = cursor.fetchone()
-  if(data):
-    error = "This user already exists"
-    return render_template('registerStaff.html')
-  else:
-    ins = 'INSERT INTO Airline_staff VALUES(%s, %s, md5(%s), %s, %s, %s)'
-    cursor.execute(ins, (username, airline_name, password, f_name, l_name, DOB))
-    conn.commit()
-    cursor.close()
-    return render_template('startpage.html')
+    cursor = conn.cursor()
+    query = 'SELECT * FROM airline_staff WHERE username = %s'
+    cursor.execute(query, (username))
+    data = cursor.fetchone()
+    if data:
+        error = "This user already exists"
+        return render_template('registerStaff.html')
+    else:
+        ins = 'INSERT INTO Airline_staff VALUES(%s, %s, md5(%s), %s, %s, %s)'
+        cursor.execute(ins, (username, airline_name, password, f_name, l_name, DOB))
+        conn.commit()
+        cursor.close()
+        return render_template('startpage.html')
 
 @app.route('/staffHome')
 def staffHome():
@@ -179,16 +179,28 @@ def addAirplaneAuth():
 
 def getStaffAirline():
     username = session['username']
-    cursor = conn.cursor()
-    query = 'select airline_name from Airline_staff where username = %s'
-    cursor.execute(query, (username))
-    airline = cursor.fetchone()['airline_name']
-    cursor.close()
-    return airline
+    try:
+        cursor = conn.cursor()
+        query = 'select airline_name from Airline_staff where username = %s'
+        cursor.execute(query, (username))
+        airline = cursor.fetchone()['airline_name']
+        cursor.close()
+        return airline
+    except mysql.conn.Error as e:
+        print("Error reading data into airline_staff table", e)
+    finally:
+        cursor.close()
+    return None
     
 @app.route('/createFlight')
 def createFlight():
+    error = None
+    username = session['username']
     airline = getStaffAirline()
+    if airline is None:
+        error = 'Staff has no airline? Please log in again'
+        session.pop('username')
+        return render_template('error.html', error=error)
     
     cursor = conn.cursor()
     query = 'select name from airport'
@@ -218,12 +230,15 @@ def createFlightAuth():
     airplane_num = request.form['airplanenum']
     base_price = request.form['base_price']
     status = request.form['status']
-    cursor = conn.cursor()
-    query = 'insert into flight values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-    cursor.execute(query, (flightnum, departtime, airline_operator, owner_name, arrivetime, departnum, arrivenum, airplane_num, base_price, status))
-    conn.commit()
-    cursor.close()
-    
+    try:
+        cursor = conn.cursor()
+        query = 'insert into flight values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+        cursor.execute(query, (flightnum, departtime, airline_operator, owner_name, arrivetime, departnum, arrivenum, airplane_num, base_price, status))
+        conn.commit()
+    except mysql.conn.Error as e:
+        print("Error inserting data into flight table", e)
+    finally:
+        cursor.close()
     return redirect(url_for('staffHome'))
 
 @app.route('/publicSearch')
@@ -239,25 +254,28 @@ def searchResult():
     departtime = request.form['departtime']
     arrivetime = request.form['arrivetime']
     
-    #cursor used to send queries
-    cursor = conn.cursor()
-    #executes query
-    query = 'select flight_num, airline_operator, dept_datetime, arrive_datetime, base_price, status from flight,airport as S, airport as D where date(dept_datetime) <= %s and date(arrive_datetime) <= %s and %s = S.name and %s = D.name and %s = S.city and %s = D.city and dept_airport_id = S.airport_id and arrive_airport_id = D.airport_id'
-    cursor.execute(query, (departtime, arrivetime, srcName, dstName, srcCity, dstCity))
-    #stores the results in a variable
-    data = cursor.fetchall()
-    cursor.close()
-    error = None
-    if (data)
-        return render_template('search.html', results=data)
-    else
+    try:
+        #cursor used to send queries
+        cursor = conn.cursor()
+        query = 'select flight_num, airline_operator, dept_datetime, arrive_datetime, base_price, status from flight,airport as S, airport as D where date(dept_datetime) <= %s and date(arrive_datetime) <= %s and %s = S.name and %s = D.name and %s = S.city and %s = D.city and dept_airport_id = S.airport_id and arrive_airport_id = D.airport_id'
+        cursor.execute(query, (departtime, arrivetime, srcName, dstName, srcCity, dstCity))
+        #stores the results in a variable
+        data = cursor.fetchall()
+        cursor.close()
+        error = None
+        if not data:
+            error = 'No results met your filters: Please try again'
+        return render_template('search.html', error=error, results=data)
+    except mysql.conn.Error as e:
+        print("Error reading data from flight,airport as S, airport as D table", e)
+        cursor.close()
         error = 'Invalid search filters: Please try again'
         return render_template('search.html', error=error)
 
 @app.route('/logout')
 def logout():
-  session.pop('username')
-  return redirect('/login')
+    session.pop('username')
+    return redirect('/login')
   
 app.run(debug = True)
 

@@ -23,6 +23,22 @@
 
 </form>
 <!--need to specify the airports and airplanes available to staff-->
+<h3>Change Status</h3>
+
+<form action="/changeStatus" method="POST">
+  <input type="text" name = "flightnum" placeholder="Flight Number" required/> </br>
+  <input type="radio" name="status" value="Upcoming"> on-time
+  <input type="radio" name="status" value="Delayed"> delayed
+  <input type="submit" value = Update />
+
+</form>
+
+<h3>View Status</h3>
+
+<form action="/viewRatings" method="POST">
+  <input type="text" name = "flightnum" placeholder="Flight Number" required/> </br>
+  <input type="submit" value = view />
+</form>
 
 <h4> Future Flights by Your Airline Departing in 30 days </h4>
 <style type="text/css">
@@ -33,11 +49,13 @@
 <table>
 	<th>Flight Number</th>
 	<th>Departure Time</th>
+  <th>Status</th>
 
 {% for line in futureFlights %}
 	<tr>
 		<td>{{line['flight_num']}}</td>
 		<td>{{line['dept_datetime']}}</td>
+    <td>{{line['status']}}</td>
 	</tr>
 {% endfor %}
 </table>

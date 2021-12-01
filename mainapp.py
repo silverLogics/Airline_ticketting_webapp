@@ -280,6 +280,26 @@ def createFlightAuth():
     finally:
         cursor.close()
     return redirect(url_for('staffHome'))
+    
+@app.route('/changeStatus', methods=['POST'])
+def changeStatus():
+    username = session['username']
+    cursor = conn.cursor()
+    flightnum = request.form['flight_num']
+    status = request.form['status']
+    if not status:
+        error = 'no new status selected'
+        return redirect(url_for('createFlight', error=error))
+    
+    query = 'update flight set status=%s where flight_num=%s and airline_name = %s'
+    cursor.execute(query, (status, flightnum, airline))
+    conn.commit()
+    cursor.close()
+    return redirect(url_for('createFlight'))
+
+@app.route('/publicSearch')
+
+
 
 @app.route('/publicSearch')
 def publicSearch():

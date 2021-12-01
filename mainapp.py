@@ -315,6 +315,20 @@ def viewRatings():
         count+=1
     avgrating=sum/count
     return render_template('viewRating.html', flightnum=flightnum,avgrating=avgrating,data=data)
+    
+    
+@app.route('/viewCustomers')
+def viewCustomers():
+    airline = getStaffAirline()
+        
+    cursor = conn.cursor()
+    query = 'select email, count(t_id) as tickets from purchase natural join Ticket where airline_operator= %s and purchasedate_time >= date_sub(curdate(), interval 1 year) group by email having tickets >= all (select count(t_id) from purchase natural join ticket  where airline_operator = %s and purchasedate_time >= date_sub(curdate(), interval 1 year) GROUP by email)'
+    cursor.execute(query, (airline, airline))
+    data = cursor.fetchall()
+    cursor.close()
+
+    return render_template('viewCustomers.html', results=data)
+
 
 @app.route('/publicSearch')
 def publicSearch():

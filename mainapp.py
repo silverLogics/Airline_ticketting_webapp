@@ -297,9 +297,24 @@ def changeStatus():
     cursor.close()
     return redirect(url_for('createFlight'))
 
-@app.route('/publicSearch')
-
-
+@app.route('/viewRatings')
+def viewRatings():
+    username = session['username']
+    cursor = conn.cursor()
+    flightnum = request.form['flight_num']
+    if not flightnum:
+        error = 'no new flightnum selected'
+        return redirect(url_for('createFlight', error=error))
+    query = 'select * from review where flight_num=%s'
+    cursor.execute(query, (flightnum))
+    data=cursor.fetchall()
+    sum=0
+    count=0
+    for i in rating_data:
+        sum+=i.rating
+        count+=1
+    avgrating=sum/count
+    return render_template('viewRating.html', flightnum=flightnum,avgrating=avgrating,data=data)
 
 @app.route('/publicSearch')
 def publicSearch():

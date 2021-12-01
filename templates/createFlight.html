@@ -26,14 +26,14 @@
 <h3>Change Status</h3>
 
 <form action="/changeStatus" method="POST">
-  <input type="text" name = "flightnum" placeholder="Flight Number" required/> </br>
+  <input type="text" name = "flight_num" placeholder="Flight Number" required/> </br>
   <input type="radio" name="status" value="Upcoming"> on-time
   <input type="radio" name="status" value="Delayed"> delayed
   <input type="submit" value = Update />
 
 </form>
 
-<h3>View Status</h3>
+<h3>View Ratings</h3>
 
 <form action="/viewRatings" method="POST">
   <input type="text" name = "flightnum" placeholder="Flight Number" required/> </br>

@@ -4,11 +4,12 @@
 
 <form action="/createFlightAuth" method="POST">
   <input type="number" name = "flightnum" placeholder="Flight Number" required/> </br>
-  Arrival Time </br>
-  <input type=datetime-local name = "arrivetime" step="1" required> </br>
+  <input type="text" name = "airline_operator" placeholder="airline operator" required/> </br>
   Departure Time </br>
   <input type=datetime-local name = "departtime" step="1" required> </br>
-  <input type="text" name = "airline_operator" placeholder="airline operator" required/> </br>
+  Arrival Time </br>
+  <input type=datetime-local name = "arrivetime" step="1" required> </br>
+
   <input type="text" name = "owner_airline" placeholder="owner airline" required/> </br>
 
   <input type="number" name = "departnum" placeholder="Departure Airport ID" required/> </br>
@@ -22,6 +23,42 @@
 
 </form>
 <!--need to specify the airports and airplanes available to staff-->
+<h3>Change Status</h3>
+
+<form action="/changeStatus" method="POST">
+  <input type="text" name = "flight_num" placeholder="Flight Number" required/> </br>
+  <input type="radio" name="status" value="Upcoming"> on-time
+  <input type="radio" name="status" value="Delayed"> delayed
+  <input type="submit" value = Update />
+
+</form>
+
+<h3>View Ratings</h3>
+
+<form action="/viewRatings" method="POST">
+  <input type="text" name = "flightnum" placeholder="Flight Number" required/> </br>
+  <input type="submit" value = view />
+</form>
+
+<h4> Future Flights by Your Airline Departing in 30 days </h4>
+<style type="text/css">
+	table, th, td{
+		border: 1px solid black;
+	}
+</style>
+<table>
+	<th>Flight Number</th>
+	<th>Departure Time</th>
+  <th>Status</th>
+
+{% for line in futureFlights %}
+	<tr>
+		<td>{{line['flight_num']}}</td>
+		<td>{{line['dept_datetime']}}</td>
+    <td>{{line['status']}}</td>
+	</tr>
+{% endfor %}
+</table>
 
 <a href="/staffHome">Go back</a>
 

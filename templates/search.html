@@ -1,0 +1,55 @@
+<html>
+
+<body>
+
+<h1> Search Filters </h1>
+
+<form action="/searchResult" method="POST">
+  <input type="text" name = "srcName" placeholder="Source Airport Name" required/> </br>
+  <input type="text" name = "srcCity" placeholder="Source Airport City" required/> </br>
+  <input type="text" name = "dstName" placeholder="Destination Airport Name" required/> </br>
+  <input type="text" name = "dstCity" placeholder="Destination Airport City" required/> </br>
+  Departure Time </br>
+  <input type=datetime-local name = "departtime" step="1" required> </br>
+  <h1> If Round Trip </h1>
+  Arrival Time </br>
+  <input type=datetime-local name = "arrivetime" step="1"> </br>
+<!--need to specify default values!!-->
+  <input type="submit" value = Submit />
+  {% if error %}
+	<p class="error"><strong>Error:</strong> {{error}}</p>
+  {% endif %}
+  {% if results %}
+	<h4> Query Results </h4>
+	<style type="text/css">
+		table, th, td{
+			border: 1px solid black;
+		}
+	</style>
+	<table>
+		<th>Flight Number</th>
+		<th>Airline Operator</th>
+		<th>Departure Time</th>
+		<th>Arrival Time</th>
+		<th>Base Price</th>
+		<th>Status</th>
+	{% for line in results %}
+		<tr>
+			<td>{{line['flight_num']}}</td>
+			<td>{{line['airline_operator']}}</td>
+			<td>{{line['dept_datetime']}}</td>
+			<td>{{line['arrive_datetime']}}</td>
+			<td>{{line['base_price']}}</td>
+			<td>{{line['status']}}</td>
+		</tr>
+	{% endfor %}
+	</table>
+  {% endif %}
+</form>
+
+<a href="/">Go back</a>
+
+</body>
+
+
+</html>

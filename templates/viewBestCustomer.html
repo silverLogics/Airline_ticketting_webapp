@@ -1,0 +1,25 @@
+<html>
+<head>
+</head>
+<body>
+
+<h2>Most frequent</h2>
+
+<table>
+	<th>customer email</th>
+	<th>tickets purchased</th>
+
+{% for line in results %}
+	<tr>
+		<td>{{line.email}}</td>
+		<td>{{line.tickets}}</td>
+	</tr>
+{% endfor %}
+</table>
+</br></br>
+<a href="/staffHome">Return</a>
+
+</body>
+
+
+</html>

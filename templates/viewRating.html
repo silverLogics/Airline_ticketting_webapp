@@ -1,0 +1,31 @@
+<html>
+<head>
+</head>
+
+<body>
+
+<div>
+  <h1>For Flight {{flightnum}}</h1>
+</div>
+<div>
+  <h4>average rating = {{avgrating}}</h4>
+</div>
+
+<div class="viewRatings">
+
+  <table>
+  	<th>Rating</th>
+  	<th>Comment</th>
+
+  {% for line in data %}
+  	<tr>
+  		<td>{{line['rating']}}</td>
+  		<td>{{line['comment']}}</td>
+  	</tr>
+  {% endfor %}
+  </table>
+<a href="/logout"> Logout</a><br/>
+
+</body>
+
+</html>

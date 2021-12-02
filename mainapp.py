@@ -106,9 +106,9 @@ def AuthCustomer():
         error = None
     except mysql.conn.Error as e:
         print("Error reading data from customer", e)
+        error = "Error reading data from customer. Please try again"
     finally:
         cursor.close()
-        error = "Error reading data from customer. Please try again"
         return render_template('registerCust.html', error = error)
     if(data): #if data exists
         error = "This user already exists"
@@ -149,9 +149,9 @@ def AuthStaff():
         data = cursor.fetchone()
     except mysql.conn.Error as e:
         print("Error reading data from airline_staff", e)
+        error = "Error reading data from airline_staff. Please try again"
     finally:
         cursor.close()
-        error = "Error reading data from airline_staff. Please try again"
         return render_template('registerCust.html', error = error)
     if data:
         error = "This user already exists"

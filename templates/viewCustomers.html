@@ -4,7 +4,12 @@
 <body>
 
 <h2>Most frequent</h2>
-
+<style type="text/css">
+	table, th, td{
+		border: 1px solid black;
+	}
+</style>
+<form action="/viewCustomers" method="POST">
 <table>
 	<th>customer email</th>
 	<th>tickets purchased</th>
@@ -16,6 +21,7 @@
 	</tr>
 {% endfor %}
 </table>
+</form>
 </br></br>
 <a href="/staffHome">Return</a>
 

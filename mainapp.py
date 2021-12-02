@@ -152,7 +152,7 @@ def AuthStaff():
     finally:
         cursor.close()
         error = "Error reading data from airline_staff. Please try again"
-        return render_template('registerCust.html', error = error)
+        return render_template('registerStaff.html', error = error)
     if data:
         error = "This user already exists"
         return render_template('registerStaff.html')
@@ -167,7 +167,7 @@ def AuthStaff():
             print("Error writing data into airline_staff", e)
             cursor.close()
             error = "Error writing data into airline_staff. Please try again"
-    return render_template('registerCust.html', error = error)
+    return render_template('registerStaff.html', error = error)
 
 @app.route('/staffHome')
 def staffHome():
@@ -251,7 +251,7 @@ def createFlight():
     cursor.execute(query, (airline))
     availableairplane = cursor.fetchall()
 
-    query = 'select flight_num, dept_datetime from flight where airline_operator = %s and date(dept_datetime) > now() and date(dept_datetime) <= date_add(now(), interval 30 hour)'
+    query = 'select status, flight_num, dept_datetime from flight where airline_operator = %s and date(dept_datetime) > now();'
     cursor.execute(query, (airline))
     futureFlights = cursor.fetchall()
     
@@ -284,6 +284,7 @@ def createFlightAuth():
 @app.route('/changeStatus', methods=['POST'])
 def changeStatus():
     username = session['username']
+    staff_airline=getStaffAirline()
     cursor = conn.cursor()
     flightnum = request.form['flight_num']
     status = request.form['status']
@@ -291,30 +292,33 @@ def changeStatus():
         error = 'no new status selected'
         return redirect(url_for('createFlight', error=error))
     
-    query = 'update flight set status=%s where flight_num=%s and airline_name = %s'
-    cursor.execute(query, (status, flightnum, airline))
+    query = 'update flight set status=%s where flight_num=%s and airline_operator = %s'
+    cursor.execute(query, (status, flightnum, staff_airline))
     conn.commit()
     cursor.close()
     return redirect(url_for('createFlight'))
 
-@app.route('/viewRatings')
+@app.route('/viewRatings', methods=['POST'])
 def viewRatings():
     username = session['username']
+    staff_airline=getStaffAirline()
     cursor = conn.cursor()
-    flightnum = request.form['flight_num']
+    '''flightnum = request.form['flight_number']
+    flightnum = request.form['fli']
     if not flightnum:
         error = 'no new flightnum selected'
-        return redirect(url_for('createFlight', error=error))
-    query = 'select * from review where flight_num=%s'
-    cursor.execute(query, (flightnum))
-    data=cursor.fetchall()
-    sum=0
+        return redirect(url_for('createFlight', error=error))'''
+    #query = 'select * from review where flight_num=%s'
+    query = 'select * from review'
+    cursor.execute(query)
+    ratedata=cursor.fetchall()
+    '''sum=0
     count=0
     for i in rating_data:
         sum+=i.rating
         count+=1
-    avgrating=sum/count
-    return render_template('viewRating.html', flightnum=flightnum,avgrating=avgrating,data=data)
+    avgrating=sum/count'''
+    return render_template('createFlight.html', ratedata=ratedata)
     
     
 @app.route('/viewCustomers')
@@ -324,10 +328,10 @@ def viewCustomers():
     cursor = conn.cursor()
     query = 'select email, count(t_id) as tickets from purchase natural join Ticket where airline_operator= %s and purchasedate_time >= date_sub(curdate(), interval 1 year) group by email having tickets >= all (select count(t_id) from purchase natural join ticket  where airline_operator = %s and purchasedate_time >= date_sub(curdate(), interval 1 year) GROUP by email)'
     cursor.execute(query, (airline, airline))
-    data = cursor.fetchall()
+    results = cursor.fetchall()
     cursor.close()
 
-    return render_template('viewCustomers.html', results=data)
+    return render_template('viewCustomers.html', results=results)
 
 
 @app.route('/publicSearch')

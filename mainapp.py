@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, session, url_for, redirect  # importing the render_template function
 import pymysql
+import datetime
  
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
@@ -170,6 +171,7 @@ def AuthStaff():
             error = "Error writing data into airline_staff. Please try again"
     return render_template('registerStaff.html', error = error)
 
+
 @app.route('/staffHome')
 def staffHome():
     username = session['username']
@@ -321,7 +323,7 @@ def viewRatings():
     avgrating=sum/count'''
     return render_template('createFlight.html', ratedata=ratedata)
     
-    
+
 @app.route('/viewCustomers')
 def viewCustomers():
     airline = getStaffAirline()
@@ -334,7 +336,26 @@ def viewCustomers():
 
     return render_template('viewCustomers.html', results=results)
 
+@app.route('/viewReports')
+def viewReports():
 
+    airline = getStaffAirline()
+    currentmonth = datetime.datetime.now().month
+    monthtickets = []
+        
+    cursor = conn.cursor()
+    for i in range(0, 12):
+        query = 'select count(t_id) as num_tic from purchase natural join ticket where year(purchasedate_time) = year(curdate() - interval ' + str(i) + ' month) and month(purchasedate_time) = month(curdate() - interval ' + str(i) + ' month) and airline_operator=%s'
+        cursor.execute(query, (airline))
+        data = cursor.fetchall()
+        salemonth = ((currentmonth - (i+1)) % 12) + 1
+        print (data[0]['num_tic'])
+        monthtickets.append([data[0]['num_tic'], salemonth])
+        print(monthtickets)
+    cursor.close()
+    return render_template('viewReports.html', results=monthtickets)
+    
+ 
 @app.route('/publicSearch')
 def publicSearch():
     return render_template('search.html')

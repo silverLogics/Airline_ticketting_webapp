@@ -1,0 +1,26 @@
+<html>
+<head>
+</head>
+<body>
+
+<h2>View Reports</h2>
+<h4>Sales by month</h4>
+
+<div class="chart">
+    {% for line in results %}
+    <h5>{{line[1]}}
+      <div style="font-size: {{(line[0]+1) * 10}}px;">-</div>
+    </h5>
+    {% endfor %}
+
+</div>
+</br>
+
+
+</br>
+<a href="/staffhome">return</a>
+
+</body>
+
+
+</html>

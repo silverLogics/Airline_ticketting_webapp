@@ -351,20 +351,20 @@ def viewReports():
     cursor.close()
     return render_template('viewReports.html', results=monthtickets)
 
-@app.route('/viewReports/dates')
-def viewReports():
 
+@app.route('/viewReports/dates', methods=['POST'])
+def viewReportsDates():
     airline = getStaffAirline()
     start = request.form['start']
     end = request.form['end']
     
     cursor = conn.cursor()
-    query = 'select count(t_id) as num_tic from purchase natural join ticket where airline_operator=%s and purchasedate_time between %s and %s'
+    query = 'select count(ticket_id) as num_tic from purchase natural join ticket where airline_operator=%s and purchasedate_time between %s and %s'
     cursor.execute(query, (airline, start, end))
     data = cursor.fetchall()
     cursor.close()
     
-    return render_template('viewReportsDate.html', sales=data[0]['num_tic'], start=start, end=end)
+    return render_template('viewReportswDate.html', sales=data[0]['num_tic'], start=start, end=end)
     
  
 @app.route('/publicSearch')

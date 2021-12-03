@@ -377,6 +377,20 @@ def Revenue():
     monthrev = cursor.fetchall()
     cursor.close()
     return render_template('viewRevenue.html', yearrev=yearrev, monthrev=monthrev)
+
+@app.route('/topDestinations')
+def topDestinations():
+    airline = getStaffAirline()
+    cursor = conn.cursor()
+    query = 'select name, count(t_id) from ticket NATURAL JOIN flight NATURAL JOIN airport group by dept_airport_id where airline_operator = %s having DATE_SUB(curdate(), interval 3 month) and curdate()'
+    cursor.execute(query, (airline))
+    monthdata=cursor.fetchall()
+    #sort and get top 3
+    query = 'select name, count(t_id) from ticket NATURAL JOIN flight NATURAL JOIN airport group by dept_airport_id where airline_operator = %s having DATE_SUB(curdate(), interval 1 year) and curdate()'
+    cursor.execute(query, (airline))
+    yeardata=cursor.fetchall()
+    cursor.close()
+    return render_template('topDestinations.html', monthdata=monthdata[0:3], yeardata=yeardata[0:3])
  
 @app.route('/publicSearch')
 def publicSearch():

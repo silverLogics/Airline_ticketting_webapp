@@ -285,13 +285,14 @@ def createFlightAuth():
 def changeStatus():
     username = session['username']
     cursor = conn.cursor()
+    airline = getStaffAirline()
     flightnum = request.form['flight_num']
     status = request.form['status']
     if not status:
         error = 'no new status selected'
         return redirect(url_for('createFlight', error=error))
     
-    query = 'update flight set status=%s where flight_num=%s and airline_name = %s'
+    query = 'update flight set status=%s where flight_num=%s and airline_operator = %s'
     cursor.execute(query, (status, flightnum, airline))
     conn.commit()
     cursor.close()

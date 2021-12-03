@@ -353,7 +353,6 @@ def viewReports():
 @app.route('/viewReports/dates', methods=['POST'])
 def viewReportsDates():
     airline = getStaffAirline()
-    print(airline)
     start = request.form['start']
     end = request.form['end']
     
@@ -365,7 +364,19 @@ def viewReportsDates():
     print(data)
     
     return render_template('viewReportswDate.html', tot_sales=data[0]['num_tic'], start=start, end=end)
-    
+
+@app.route('/Revenue')
+def Revenue():
+    airline = getStaffAirline()
+    cursor = conn.cursor()
+    query = 'select sum(sold_price) as yearrev from purchase natural join ticket where airline_operator=%s and purchasedate_time between DATE_SUB(curdate(), interval 1 year) and curdate()'
+    cursor.execute(query, (airline))
+    yearrev = cursor.fetchall()
+    query = 'select sum(sold_price) as monthrev from purchase natural join ticket where airline_operator=%s and purchasedate_time between DATE_SUB(curdate(), interval 1 month) and curdate()'
+    cursor.execute(query, (airline))
+    monthrev = cursor.fetchall()
+    cursor.close()
+    return render_template('viewRevenue.html', yearrev=yearrev, monthrev=monthrev)
  
 @app.route('/publicSearch')
 def publicSearch():

@@ -1,0 +1,27 @@
+<html>
+<body>
+<h3>top three flights over the past 3 months</h3>
+<table>
+	<th>Flight Number</th>
+
+{% for line in monthdata %}
+	<tr>
+		<td>{{line['flight_num']}}</td>
+	</tr>
+{% endfor %}
+</table>
+<h3>top three flights over the past year</h3>
+<table>
+	<th>Flight Number</th>
+
+{% for entry in yeardata %}
+	<tr>
+		<td>{{entry['flight_num']}}</td>
+	</tr>
+{% endfor %}
+</table>
+
+<a href="/createFlight">Search again</a>
+
+</body>
+</html>

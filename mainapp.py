@@ -353,6 +353,7 @@ def viewReports():
 @app.route('/viewReports/dates', methods=['POST'])
 def viewReportsDates():
     airline = getStaffAirline()
+    print(airline)
     start = request.form['start']
     end = request.form['end']
     
@@ -361,8 +362,9 @@ def viewReportsDates():
     cursor.execute(query, (airline, start, end))
     data = cursor.fetchall()
     cursor.close()
+    print(data)
     
-    return render_template('viewReportswDate.html', sales=data[0]['num_tic'], start=start, end=end)
+    return render_template('viewReportswDate.html', tot_sales=data[0]['num_tic'], start=start, end=end)
     
  
 @app.route('/publicSearch')

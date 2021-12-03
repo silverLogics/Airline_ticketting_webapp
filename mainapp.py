@@ -430,7 +430,48 @@ def viewMyFlights():
         error = 'Invalid query: Please try again'
         return render_template('viewFlights.html', error=error)
 
-     
+@app.route('/customerhome/purchaseTicket')
+def purchaseTicket():
+    return render_template('purchaseTicket.html')
+
+@app.route('/purchaseTicketAuth', methods=['POST'])
+def purchaseTicketAuth():
+    username = session['username']
+    t_id = request.form['t_id']
+    card_type = request.form['card_type']
+    number = request.form['number']
+    expiration = request.form['expiration']
+    Cardname = request.form['Cardname']
+    try:
+        cursor = conn.cursor()
+        query = 'insert into purchase values (%s, %s, %s, %s, %s, now())'
+        cursor.execute(query, (username, t_id, card_type, number, expiration, Cardname))
+        query = 'select base_price, num_seats, S.flight_num, S.dept_datetime, S.airline_operator from ticket as S, flight as T, airplane as U where t_id = %s and S.flight_num = T.flight_num and S.dept_datetime = T.dept_datetime and S.airline_operator = T.airline_operator and T.airplane_id = U.airplane_id'
+        cursor.execute(query, (t_id))
+        data = cursor.fetchone()
+        base = data[base_price]
+        capacity = data[num_seats]
+        flight_num = data[flight_num]
+        dept_datetime = data[dept_datetime]
+        airline_operator = data[airline_operator]
+        query = 'select count(*) from ticket as S, flight as T where S.flight_num = T.flight_num and S.dept_datetime = T.dept_datetime and S.airline_operator = T.airline_operator and S.flight_num = %s and S.dept_datetime = %s and S.airline_operator = %s'
+        cursor.execute(query, (flight_num, dept_datetime, airline_operator))
+        data = cursor.fetchone()
+        if data < (0.75 * capacity):
+            query = 'update ticket set sold_price = %s where t_id = %s'
+            cursor.execute(query, (base, t_id))
+        else:
+            query = 'update ticket set sold_price = %s * 1.25 where t_id = %s'
+            cursor.execute(query, (base, t_id))
+        cursor.execute(query, (t_id))
+        conn.commit()
+    except conn.Error as e:
+        print("Error inserting data into ticket and/or purchase table", e)
+        cursor.close()
+    finally:
+        cursor.close()
+    return redirect(url_for('customerHome'))
+
 @app.route('/logout')
 def logout():
     session.pop('username')

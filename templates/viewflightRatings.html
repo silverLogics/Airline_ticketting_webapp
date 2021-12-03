@@ -1,0 +1,17 @@
+<html>
+<body>
+<h4>average rating = {{avgrate}}</h4>
+<table>
+  	<th>Rating</th>
+  	<th>Comment</th>
+  {% for line in ratedata %}
+  	<tr>
+  		<td>{{line['rating']}}</td>
+  		<td>{{line['comment']}}</td>
+  	</tr>
+  {% endfor %}
+  </table>
+  <a href="/createFlight">Search again</a>
+
+</body>
+</html>

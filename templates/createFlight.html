@@ -35,19 +35,10 @@
 
 <h3>View Ratings</h3>
 
-<form action="/viewRatings" method="POST">
-  <input type="text" name = "fli" placeholder="Flight Number" required/> </br>
-  <input type="submit" value="Submit"/>
-  <table>
-  	<th>Rating</th>
-  	<th>Comment</th>
-  {% for line in ratedata %}
-  	<tr>
-  		<td>{{line['rating']}}</td>
-  		<td>{{line['comment']}}</td>
-  	</tr>
-  {% endfor %}
-  </table>
+<form action="/createFlight/viewRatings" method="POST">
+  flight num</br>
+  <input type="text" name = "fli" required/> </br>
+  <input type="submit" value="Search"/>
 </form>
 
 <h4> Future Flights </h4>

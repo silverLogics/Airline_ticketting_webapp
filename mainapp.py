@@ -297,25 +297,23 @@ def changeStatus():
     cursor.close()
     return redirect(url_for('createFlight'))
 
-@app.route('/viewRatings', methods=['POST'])
+@app.route('/createFlight/viewRatings', methods=['POST'])
 def viewRatings():
     username = session['username']
     cursor = conn.cursor()
-    '''flightnum = request.form['flight_num']
-    if not flightnum:
-        error = 'no new flightnum selected'
-        return redirect(url_for('createFlight', error=error))'''
+    flightnum = request.form['fli']
     query = 'select * from review where flight_num=%s'
-    cursor.execute(query, (3))
+    cursor.execute(query, (flightnum))
     ratedata=cursor.fetchall()
-    print(ratedata)
-    '''sum=0
+    total=0
     count=0
     for i in ratedata:
-        sum+=i.rating
         count+=1
-    avgrating=sum/count'''
-    return render_template('createFlight.html', ratedata=ratedata)
+        total+=i['rating']
+    print(ratedata)
+    avgrate=total/count
+    print(total)
+    return render_template('viewflightRatings.html', ratedata=ratedata, avgrate=avgrate)
 
 
     
@@ -359,7 +357,7 @@ def viewReportsDates():
     end = request.form['end']
     
     cursor = conn.cursor()
-    query = 'select count(ticket_id) as num_tic from purchase natural join ticket where airline_operator=%s and purchasedate_time between %s and %s'
+    query = 'select count(t_id) as num_tic from purchase natural join ticket where airline_operator=%s and purchasedate_time between %s and %s'
     cursor.execute(query, (airline, start, end))
     data = cursor.fetchall()
     cursor.close()

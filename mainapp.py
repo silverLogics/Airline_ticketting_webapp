@@ -302,20 +302,20 @@ def changeStatus():
 def viewRatings():
     username = session['username']
     cursor = conn.cursor()
-    flightnum = request.form['flight_num']
+    '''flightnum = request.form['flight_num']
     if not flightnum:
         error = 'no new flightnum selected'
-        return redirect(url_for('createFlight', error=error))
+        return redirect(url_for('createFlight', error=error))'''
     query = 'select * from review where flight_num=%s'
-    cursor.execute(query, (flightnum))
-    data=cursor.fetchall()
-    sum=0
+    cursor.execute(query, (3))
+    ratedata=cursor.fetchall()
+    '''sum=0
     count=0
-    for i in rating_data:
+    for i in ratedata:
         sum+=i.rating
         count+=1
-    avgrating=sum/count
-    return render_template('viewRating.html', flightnum=flightnum,avgrating=avgrating,data=data)
+    avgrating=sum/count'''
+    return render_template('createFlight.html', ratdata=ratedata)
     
     
 @app.route('/viewCustomers')

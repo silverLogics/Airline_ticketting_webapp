@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, session, url_for, redirect  # importing the render_template function
 import pymysql
-import datetime
  
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
@@ -48,11 +47,9 @@ def loginAuth():
                 session['username'] = email
                 return redirect(url_for('customerHome')) #redirect to customer home page
         else:
-            error = 'Invalid login or username'
-            return render_template('login.html', error = error)
           error = 'Invalid login or username'
           return render_template('login.html', error = error)
-    except conn.Error as e:
+    except mysql.conn.Error as e:
         print("Error reading data from airline_staff or customer table while login", e)
     finally:
         cursor.close()
@@ -68,7 +65,7 @@ def customerHome():
         cursor.execute(query, (email))
         data = cursor.fetchall()
         cursor.close()
-    except conn.Error as e:
+    except mysql.conn.Error as e:
         print("Error reading data from purchase, Ticket, Flight table", e)
     finally:
         cursor.close()
@@ -98,7 +95,6 @@ def AuthCustomer():
     DOB = request.form['date_of_birth']
     error = None
     try:
-        print("FIRST TRY")
         #cursor used to send queries
         cursor = conn.cursor()
         query = 'SELECT * FROM customer WHERE email = %s'
@@ -108,29 +104,25 @@ def AuthCustomer():
         data = cursor.fetchone()
         # use fetchall() if you are expecting more than 1 data row
         error = None
-    except conn.Error as e:
+    except mysql.conn.Error as e:
         print("Error reading data from customer", e)
         error = "Error reading data from customer. Please try again"
+    finally:
         cursor.close()
         return render_template('registerCust.html', error = error)
-    finally:
-        #cursor.close()
-        print("Dupe customer checking")
-    if data: #if data exists
-        print("NEW CUSTOMER EXISTS")
+    if(data): #if data exists
         error = "This user already exists"
         cursor.close()
         return render_template('registerCust.html', error = error)
     else:
         try:
-            print("NEW CUSTOMER ERROR")
             ins = 'INSERT INTO customer VALUES(%s, %s, md5(%s), %s, %s, %s, %s, %s, %s, %s, %s, %s)'
             #insert query
             cursor.execute(ins, (email, name, password, building_number, street, city, state, phone_number, passport_number, passport_expiration, passport_country,DOB))
             conn.commit()
             cursor.close()
             return render_template('startpage.html')
-        except conn.Error as e:
+        except mysql.conn.Error as e:
             print("Error writing data into customer", e)
             cursor.close()
             error = "Error writing data into customer. Please try again"
@@ -155,12 +147,12 @@ def AuthStaff():
         query = 'SELECT * FROM airline_staff WHERE username = %s'
         cursor.execute(query, (username))
         data = cursor.fetchone()
-    except conn.Error as e:
+    except mysql.conn.Error as e:
         print("Error reading data from airline_staff", e)
         error = "Error reading data from airline_staff. Please try again"
-        cursor.close()
     finally:
-        print("Dupe staff checking")
+        cursor.close()
+        return render_template('registerCust.html', error = error)
     if data:
         error = "This user already exists"
         return render_template('registerStaff.html')
@@ -171,12 +163,11 @@ def AuthStaff():
             conn.commit()
             cursor.close()
             return render_template('startpage.html')
-        except conn.Error as e:
+        except mysql.conn.Error as e:
             print("Error writing data into airline_staff", e)
             cursor.close()
             error = "Error writing data into airline_staff. Please try again"
-    return render_template('registerStaff.html', error = error)
-
+    return render_template('registerCust.html', error = error)
 
 @app.route('/staffHome')
 def staffHome():
@@ -199,7 +190,7 @@ def addAirport():
         cursor.execute(query, (id, name, city))
         conn.commit()
         cursor.close()
-    except conn.Error as e:
+    except mysql.conn.Error as e:
         print("Error writing data into airport table", e)
     finally:
         cursor.close()
@@ -220,7 +211,7 @@ def addAirplaneAuth():
         cursor.execute(query, (id, owner_name, seats))
         conn.commit()
         cursor.close()
-    except conn.Error as e:
+    except mysql.conn.Error as e:
         print("Error inserting data into airplane table", e)
     finally:
         cursor.close()
@@ -235,7 +226,7 @@ def getStaffAirline():
         airline = cursor.fetchone()['airline_name']
         cursor.close()
         return airline
-    except conn.Error as e:
+    except mysql.conn.Error as e:
         print("Error reading data into airline_staff table", e)
     finally:
         cursor.close()
@@ -284,7 +275,7 @@ def createFlightAuth():
         query = 'insert into flight values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
         cursor.execute(query, (flightnum, departtime, airline_operator, owner_name, arrivetime, departnum, arrivenum, airplane_num, base_price, status))
         conn.commit()
-    except conn.Error as e:
+    except mysql.conn.Error as e:
         print("Error inserting data into flight table", e)
     finally:
         cursor.close()
@@ -323,11 +314,9 @@ def viewRatings():
         sum+=i.rating
         count+=1
     avgrating=sum/count
-    return render_template('createFlight.html', ratedata=ratedata)
-    avgrating=sum/count
     return render_template('viewRating.html', flightnum=flightnum,avgrating=avgrating,data=data)
     
-
+    
 @app.route('/viewCustomers')
 def viewCustomers():
     airline = getStaffAirline()
@@ -339,7 +328,7 @@ def viewCustomers():
     cursor.close()
 
     return render_template('viewCustomers.html', results=data)
-
+    
 @app.route('/viewReports')
 def viewReports():
 
@@ -385,7 +374,7 @@ def searchResult():
         if not data:
             error = 'No results met your filters: Please try again'
         return render_template('search.html', error=error, results=data)
-    except conn.Error as e:
+    except mysql.conn.Error as e:
         print("Error reading data from flight,airport as S, airport as D table", e)
         cursor.close()
         error = 'Invalid search filters: Please try again'

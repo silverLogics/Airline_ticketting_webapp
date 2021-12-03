@@ -50,7 +50,7 @@ def loginAuth():
         else:
           error = 'Invalid login or username'
           return render_template('login.html', error = error)
-    except mysql.conn.Error as e:
+    except conn.Error as e:
         print("Error reading data from airline_staff or customer table while login", e)
     finally:
         cursor.close()
@@ -66,7 +66,7 @@ def customerHome():
         cursor.execute(query, (email))
         data = cursor.fetchall()
         cursor.close()
-    except mysql.conn.Error as e:
+    except conn.Error as e:
         print("Error reading data from purchase, Ticket, Flight table", e)
     finally:
         cursor.close()
@@ -105,7 +105,7 @@ def AuthCustomer():
         data = cursor.fetchone()
         # use fetchall() if you are expecting more than 1 data row
         error = None
-    except mysql.conn.Error as e:
+    except conn.Error as e:
         print("Error reading data from customer", e)
         error = "Error reading data from customer. Please try again"
     finally:
@@ -123,7 +123,7 @@ def AuthCustomer():
             conn.commit()
             cursor.close()
             return render_template('startpage.html')
-        except mysql.conn.Error as e:
+        except conn.Error as e:
             print("Error writing data into customer", e)
             cursor.close()
             error = "Error writing data into customer. Please try again"
@@ -148,7 +148,7 @@ def AuthStaff():
         query = 'SELECT * FROM airline_staff WHERE username = %s'
         cursor.execute(query, (username))
         data = cursor.fetchone()
-    except mysql.conn.Error as e:
+    except conn.Error as e:
         print("Error reading data from airline_staff", e)
         error = "Error reading data from airline_staff. Please try again"
     finally:
@@ -165,7 +165,7 @@ def AuthStaff():
             conn.commit()
             cursor.close()
             return render_template('startpage.html')
-        except mysql.conn.Error as e:
+        except conn.Error as e:
             print("Error writing data into airline_staff", e)
             cursor.close()
             error = "Error writing data into airline_staff. Please try again"
@@ -193,7 +193,7 @@ def addAirport():
         cursor.execute(query, (id, name, city))
         conn.commit()
         cursor.close()
-    except mysql.conn.Error as e:
+    except conn.Error as e:
         print("Error writing data into airport table", e)
     finally:
         cursor.close()
@@ -214,7 +214,7 @@ def addAirplaneAuth():
         cursor.execute(query, (id, owner_name, seats))
         conn.commit()
         cursor.close()
-    except mysql.conn.Error as e:
+    except conn.Error as e:
         print("Error inserting data into airplane table", e)
     finally:
         cursor.close()
@@ -229,7 +229,7 @@ def getStaffAirline():
         airline = cursor.fetchone()['airline_name']
         cursor.close()
         return airline
-    except mysql.conn.Error as e:
+    except conn.Error as e:
         print("Error reading data into airline_staff table", e)
     finally:
         cursor.close()
@@ -278,7 +278,7 @@ def createFlightAuth():
         query = 'insert into flight values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
         cursor.execute(query, (flightnum, departtime, airline_operator, owner_name, arrivetime, departnum, arrivenum, airplane_num, base_price, status))
         conn.commit()
-    except mysql.conn.Error as e:
+    except conn.Error as e:
         print("Error inserting data into flight table", e)
     finally:
         cursor.close()

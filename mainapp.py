@@ -409,6 +409,28 @@ def searchResult():
         error = 'Invalid search filters: Please try again'
         return render_template('search.html', error=error)
 
+@app.route('/customerhome/viewMyFlights', methods=['GET', 'POST'])
+def viewMyFlights():
+    username = session['username']
+    error = None
+    try:
+        #cursor used to send queries
+        cursor = conn.cursor()
+        query = 'select ticket.t_id, flight_num, dept_datetime, airline_operator, sold_price from ticket, purchase where date(dept_datetime) >= now() and email = %s and ticket.t_id = purchase.t_id'
+        cursor.execute(query, (username))
+        #stores the results in a variable
+        data = cursor.fetchall()
+        cursor.close()
+        if not data:
+            error = 'You have not made any reservations. Please purchase tickets to see your history.'
+        return render_template('viewFlights.html', error=error, results=data)
+    except conn.Error as e:
+        print("Error reading data from flight,airport as S, airport as D table", e)
+        cursor.close()
+        error = 'Invalid query: Please try again'
+        return render_template('viewFlights.html', error=error)
+
+     
 @app.route('/logout')
 def logout():
     session.pop('username')

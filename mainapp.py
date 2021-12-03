@@ -48,6 +48,8 @@ def loginAuth():
                 session['username'] = email
                 return redirect(url_for('customerHome')) #redirect to customer home page
         else:
+            error = 'Invalid login or username'
+            return render_template('login.html', error = error)
           error = 'Invalid login or username'
           return render_template('login.html', error = error)
     except conn.Error as e:
@@ -96,6 +98,7 @@ def AuthCustomer():
     DOB = request.form['date_of_birth']
     error = None
     try:
+        print("FIRST TRY")
         #cursor used to send queries
         cursor = conn.cursor()
         query = 'SELECT * FROM customer WHERE email = %s'
@@ -108,15 +111,19 @@ def AuthCustomer():
     except conn.Error as e:
         print("Error reading data from customer", e)
         error = "Error reading data from customer. Please try again"
-    finally:
         cursor.close()
         return render_template('registerCust.html', error = error)
-    if(data): #if data exists
+    finally:
+        #cursor.close()
+        print("Dupe customer checking")
+    if data: #if data exists
+        print("NEW CUSTOMER EXISTS")
         error = "This user already exists"
         cursor.close()
         return render_template('registerCust.html', error = error)
     else:
         try:
+            print("NEW CUSTOMER ERROR")
             ins = 'INSERT INTO customer VALUES(%s, %s, md5(%s), %s, %s, %s, %s, %s, %s, %s, %s, %s)'
             #insert query
             cursor.execute(ins, (email, name, password, building_number, street, city, state, phone_number, passport_number, passport_expiration, passport_country,DOB))
@@ -151,10 +158,9 @@ def AuthStaff():
     except conn.Error as e:
         print("Error reading data from airline_staff", e)
         error = "Error reading data from airline_staff. Please try again"
-    finally:
         cursor.close()
-        return render_template('registerStaff.html', error = error)
-
+    finally:
+        print("Dupe staff checking")
     if data:
         error = "This user already exists"
         return render_template('registerStaff.html')
@@ -254,7 +260,7 @@ def createFlight():
     cursor.execute(query, (airline))
     availableairplane = cursor.fetchall()
 
-    query = 'select status, flight_num, dept_datetime from flight where airline_operator = %s and date(dept_datetime) > now();'
+    query = 'select flight_num, dept_datetime from flight where airline_operator = %s and date(dept_datetime) > now() and date(dept_datetime) <= date_add(now(), interval 30 hour)'
     cursor.execute(query, (airline))
     futureFlights = cursor.fetchall()
     
@@ -287,7 +293,6 @@ def createFlightAuth():
 @app.route('/changeStatus', methods=['POST'])
 def changeStatus():
     username = session['username']
-    staff_airline=getStaffAirline()
     cursor = conn.cursor()
     flightnum = request.form['flight_num']
     status = request.form['status']
@@ -295,33 +300,32 @@ def changeStatus():
         error = 'no new status selected'
         return redirect(url_for('createFlight', error=error))
     
-    query = 'update flight set status=%s where flight_num=%s and airline_operator = %s'
-    cursor.execute(query, (status, flightnum, staff_airline))
+    query = 'update flight set status=%s where flight_num=%s and airline_name = %s'
+    cursor.execute(query, (status, flightnum, airline))
     conn.commit()
     cursor.close()
     return redirect(url_for('createFlight'))
 
-@app.route('/viewRatings', methods=['POST'])
+@app.route('/viewRatings')
 def viewRatings():
     username = session['username']
-    staff_airline=getStaffAirline()
     cursor = conn.cursor()
-    '''flightnum = request.form['flight_number']
-    flightnum = request.form['fli']
+    flightnum = request.form['flight_num']
     if not flightnum:
         error = 'no new flightnum selected'
-        return redirect(url_for('createFlight', error=error))'''
-    #query = 'select * from review where flight_num=%s'
-    query = 'select * from review'
-    cursor.execute(query)
-    ratedata=cursor.fetchall()
-    '''sum=0
+        return redirect(url_for('createFlight', error=error))
+    query = 'select * from review where flight_num=%s'
+    cursor.execute(query, (flightnum))
+    data=cursor.fetchall()
+    sum=0
     count=0
     for i in rating_data:
         sum+=i.rating
         count+=1
-    avgrating=sum/count'''
+    avgrating=sum/count
     return render_template('createFlight.html', ratedata=ratedata)
+    avgrating=sum/count
+    return render_template('viewRating.html', flightnum=flightnum,avgrating=avgrating,data=data)
     
 
 @app.route('/viewCustomers')
@@ -331,10 +335,10 @@ def viewCustomers():
     cursor = conn.cursor()
     query = 'select email, count(t_id) as tickets from purchase natural join Ticket where airline_operator= %s and purchasedate_time >= date_sub(curdate(), interval 1 year) group by email having tickets >= all (select count(t_id) from purchase natural join ticket  where airline_operator = %s and purchasedate_time >= date_sub(curdate(), interval 1 year) GROUP by email)'
     cursor.execute(query, (airline, airline))
-    results = cursor.fetchall()
+    data = cursor.fetchall()
     cursor.close()
 
-    return render_template('viewCustomers.html', results=results)
+    return render_template('viewCustomers.html', results=data)
 
 @app.route('/viewReports')
 def viewReports():
@@ -381,7 +385,7 @@ def searchResult():
         if not data:
             error = 'No results met your filters: Please try again'
         return render_template('search.html', error=error, results=data)
-    except mysql.conn.Error as e:
+    except conn.Error as e:
         print("Error reading data from flight,airport as S, airport as D table", e)
         cursor.close()
         error = 'Invalid search filters: Please try again'

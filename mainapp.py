@@ -151,7 +151,7 @@ def AuthStaff():
         print("Error reading data from airline_staff", e)
         error = "Error reading data from airline_staff. Please try again"
         cursor.close()
-        return render_template('registerCust.html', error = error)
+        return render_template('registerStaff.html', error = error)
     if data:
         error = "This user already exists"
         return render_template('registerStaff.html')
@@ -166,7 +166,7 @@ def AuthStaff():
             print("Error writing data into airline_staff", e)
             cursor.close()
             error = "Error writing data into airline_staff. Please try again"
-    return render_template('registerCust.html', error = error)
+    return render_template('registerStaff.html', error = error)
 
 @app.route('/staffHome')
 def staffHome():

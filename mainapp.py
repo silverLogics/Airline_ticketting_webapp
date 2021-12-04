@@ -472,6 +472,55 @@ def viewMyFlights():
         error = 'Invalid query: Please try again'
         return render_template('viewFlights.html', error=error)
 
+@app.route('/customerhome/ratings')
+def reviewTemplate():
+    return render_template('review.html')
+
+@app.route('/reviewAuth', methods=['POST'])
+def reviewAuth():
+    username = session['username']
+    flight_num = request.form['flight_num']
+    dept_datetime = request.form['dept_datetime']
+    airline_operator = request.form['airline_operator']
+    rating = request.form['rating']
+    comment = request.form['comment']
+    if int(rating) > 5:
+        error = 'rating is > 5'
+        return render_template('review.html', error=error)
+    if int(rating) < 0:
+        error = 'rating is < 0'
+        return render_template('review.html', error=error)
+    # Verify that the flight is one they have PREVIOUSLY flown
+    try:
+        cursor = conn.cursor()
+        query = 'select * from ticket as S, purchase as T where S.t_id = T.t_id and email = %s and flight_num = %s and dept_datetime = %s and airline_operator = %s and dept_datetime < now()'
+        cursor.execute(query, (username, flight_num, dept_datetime, airline_operator))
+        conn.commit()
+    except conn.Error as e:
+        print("Error reading data from ticket,purchase table", e)
+        cursor.close()
+        error = 'Ticket/Purchase Review attempt was unsuccessful, invalid Flight'
+        return render_template('review.html', error=error)
+    finally:
+        cursor.close()
+    data = cursor.fetchall()
+    print(data)
+    if not data:
+        error = 'You have not been on that flight previously'
+        return render_template('review.html', error=error)
+    try:
+        cursor = conn.cursor()
+        query = 'insert into review values (%s, %s, %s, %s, %s, %s)'
+        cursor.execute(query, (username, flight_num, dept_datetime, airline_operator, rating, comment))
+        conn.commit()
+        cursor.close()
+    except conn.Error as e:
+        print("Error inserting data into review table", e)
+        cursor.close()
+        error = 'Review attempt was unsuccessful'
+        return render_template('review.html', error=error)
+    return redirect(url_for('customerHome'))
+
 @app.route('/customerhome/purchaseTicket')
 def purchaseTicket():
     return render_template('purchaseTicket.html')

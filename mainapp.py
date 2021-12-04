@@ -385,15 +385,34 @@ def topDestinations():
     query = 'select arrive_airport_id, count(t_id) from ticket NATURAL JOIN flight NATURAL JOIN purchase where airline_operator=%s and purchasedate_time between DATE_SUB(curdate(), interval 3 month) and curdate() group by arrive_airport_id'
     cursor.execute(query, (airline))
     monthdata=cursor.fetchall()
-    print(monthdata)
     #sort and get top 3
     query = 'select arrive_airport_id, count(t_id) from ticket NATURAL JOIN flight NATURAL JOIN purchase where airline_operator=%s and purchasedate_time between DATE_SUB(curdate(), interval 1 year) and curdate() group by arrive_airport_id'
     cursor.execute(query, (airline))
     yeardata=cursor.fetchall()
     query= 'select * from Airport'
     cursor.execute(query)
-    Aiport_data=cursor.fetchall()
+    Airport_data=cursor.fetchall()
     cursor.close()
+
+    n=len(monthdata)
+    for i in range(n):
+        for j in range(0, n-i-1):
+            if monthdata[j]['count(t_id)'] < monthdata[j+1]['count(t_id)']:
+                monthdata[j],monthdata[j+1]= monthdata[j+1],monthdata[j]
+    r=len(yeardata)
+    for i in range(n):
+        for j in range(0, r-i-1):
+            if yeardata[j]['count(t_id)'] < yeardata[j+1]['count(t_id)']:
+                yeardata[j],yeardata[j+1]= yeardata[j+1],yeardata[j]
+    for i in monthdata:
+        for j in Airport_data:
+            if j['airport_id']==i['arrive_airport_id']:
+                i['city']=j['name']
+    for i in yeardata:
+        for j in Airport_data:
+            if j['airport_id']==i['arrive_airport_id']:
+                i['city']=j['name']
+    #return redirect(url_for('createFlight'))
     return render_template('topDestinations.html', monthdata=monthdata[0:3], yeardata=yeardata[0:3])
  
 @app.route('/publicSearch')

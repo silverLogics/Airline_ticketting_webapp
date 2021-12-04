@@ -275,6 +275,10 @@ def createFlightAuth():
         cursor.execute(query, (flightnum, departtime, airline_operator, owner_name, arrivetime, departnum, arrivenum, airplane_num, base_price, status))
         conn.commit()
         '''
+        query = 'select max(t_id) from Ticket'
+        cursor.execute(query)
+        data=cursor.fetchall()
+        lasttid=data[0]['max(t_id)']
         query = 'select * from airplane where airplane_id=%s'
         cursor.execute(query, airplane_num)
         data = cursor.fetchall()
@@ -283,7 +287,6 @@ def createFlightAuth():
             query = 'insert into Ticket values (%s, %s, %s, %s, %s)'
             cursor.execute(query, (lasttid+i,flightnum,departtime,airline_operator,null))
             conn.commit()
-        #update lasttid number
         '''
         
     except conn.Error as e:

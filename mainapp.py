@@ -382,13 +382,17 @@ def Revenue():
 def topDestinations():
     airline = getStaffAirline()
     cursor = conn.cursor()
-    query = 'select name, count(t_id) from ticket NATURAL JOIN flight NATURAL JOIN airport group by dept_airport_id where airline_operator = %s having DATE_SUB(curdate(), interval 3 month) and curdate()'
+    query = 'select arrive_airport_id, count(t_id) from ticket NATURAL JOIN flight NATURAL JOIN purchase where airline_operator=%s and purchasedate_time between DATE_SUB(curdate(), interval 3 month) and curdate() group by arrive_airport_id'
     cursor.execute(query, (airline))
     monthdata=cursor.fetchall()
+    print(monthdata)
     #sort and get top 3
-    query = 'select name, count(t_id) from ticket NATURAL JOIN flight NATURAL JOIN airport group by dept_airport_id where airline_operator = %s having DATE_SUB(curdate(), interval 1 year) and curdate()'
+    query = 'select arrive_airport_id, count(t_id) from ticket NATURAL JOIN flight NATURAL JOIN purchase where airline_operator=%s and purchasedate_time between DATE_SUB(curdate(), interval 1 year) and curdate() group by arrive_airport_id'
     cursor.execute(query, (airline))
     yeardata=cursor.fetchall()
+    query= 'select * from Airport'
+    cursor.execute(query)
+    Aiport_data=cursor.fetchall()
     cursor.close()
     return render_template('topDestinations.html', monthdata=monthdata[0:3], yeardata=yeardata[0:3])
  

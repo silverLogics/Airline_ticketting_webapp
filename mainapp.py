@@ -327,8 +327,13 @@ def viewCustomers():
     cursor.execute(query, (airline, airline))
     data = cursor.fetchall()
     cursor.close()
+    n=len(data)
+    for i in range(n):
+        for j in range(0, n-i-1):
+            if data[j]['tickets'] < data[j+1]['tickets']:
+                data[j],data[j+1]= data[j+1],data[j]
 
-    return render_template('viewCustomers.html', results=data)
+    return render_template('viewCustomers.html', results=data[0:1])
     
 @app.route('/viewReports')
 def viewReports():
@@ -407,11 +412,11 @@ def topDestinations():
     for i in monthdata:
         for j in Airport_data:
             if j['airport_id']==i['arrive_airport_id']:
-                i['city']=j['name']
+                i['city']=j['city']
     for i in yeardata:
         for j in Airport_data:
             if j['airport_id']==i['arrive_airport_id']:
-                i['city']=j['name']
+                i['city']=j['city']
     #return redirect(url_for('createFlight'))
     return render_template('topDestinations.html', monthdata=monthdata[0:3], yeardata=yeardata[0:3])
  

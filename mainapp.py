@@ -607,12 +607,14 @@ def trackSpendingDefault():
         for x in monthdata:
             if int(x['sum(sold_price)']) > most:
                 most = int(x['sum(sold_price)'])
-        if most == 0: #Should not ever happen since 12 appends are always being done but whatever
+        if most == 0: 
             error = 'You have not made any reservations. Please purchase tickets to see your spending.'
-            most = 1
+            most = -1
             '''
             All datapoints should be 0 anyway. This just prevents a divide by 0 error
             '''
+        else: #Absolutely completely a jork. I mean a joke. 
+            error = 'Your spending level needs to be OVER 9000!!!'
         print(most)
         return render_template('trackSpending.html', error=error, results=monthdata, total=total, most=most)
     except conn.Error as e:
@@ -620,7 +622,7 @@ def trackSpendingDefault():
         cursor.close()
         error = 'Invalid query: Please try again'
         return render_template('trackSpending.html', error=error)
-       
+
 @app.route('/customerhome/trackMySpending/results', methods=['GET', 'POST'])
 def trackSpending():
     username = session['username']
@@ -631,22 +633,43 @@ def trackSpending():
         currentmonth = datetime.datetime.now().month
         monthdata = []
         cursor = conn.cursor()
-        query = 'select sum(sold_price) from purchase natural join ticket where email = %s and purchasedate_time between DATE_SUB(curdate(), interval 6 month) and curdate()'
-        cursor.execute(query, (username))
-        sum = cursor.fetchall()
-        for i in range(1, 13):
-            print()
+        query = 'select sum(sold_price) from purchase natural join ticket where email = %s and purchasedate_time between %s and %s'
+        cursor.execute(query, (username, start, end))
+        total = cursor.fetchone()
+        if not total['sum(sold_price)']:
+            total['sum(sold_price)'] = 0 #forces it from None to 0
+        total['sum(sold_price)'] = int(total['sum(sold_price)'])#forces it from string to int
+        print(total)
+        for i in range(1, 13): #Goes in order from Jan to Dec
+            query = 'select sum(sold_price) from purchase natural join ticket where email = %s and purchasedate_time between %s and %s and month(purchasedate_time) = month(%s)'
+            cursor.execute(query, (username, start, end, i))
+            data = cursor.fetchone()
+            if not data['sum(sold_price)']:
+                data['sum(sold_price)'] = 0 #forces it from None to 0
+            data['sum(sold_price)'] = int(data['sum(sold_price)'])#forces it from string to int
+            monthdata.append(data)
         cursor.close()
         print(monthdata)
-        if not monthdata:
+        most = 0 #max spending in a month
+        for x in monthdata:
+            if int(x['sum(sold_price)']) > most:
+                most = int(x['sum(sold_price)'])
+        if most == 0: 
             error = 'You have not made any reservations. Please purchase tickets to see your spending.'
-        return render_template('trackSpending.html', error=error, results=monthdata)
+            most = -1
+            '''
+            All datapoints should be 0 anyway. This just prevents a divide by 0 error
+            '''
+        else: #Absolutely completely a jork. I mean a joke. 
+            error = 'Your spending level needs to be OVER 9000!!!'
+        print(most)
+        return render_template('trackSpending.html', error=error, results=monthdata, total=total, most=most)
     except conn.Error as e:
         print("Error reading data from purchase natural join ticket table", e)
         cursor.close()
         error = 'Invalid query: Please try again'
         return render_template('trackSpending.html', error=error)
-   
+       
 @app.route('/logout')
 def logout():
     session.pop('username')

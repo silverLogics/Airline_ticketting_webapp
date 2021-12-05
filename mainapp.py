@@ -594,10 +594,8 @@ def trackSpendingDefault():
             query = 'select sum(sold_price) from purchase natural join ticket where email = %s and purchasedate_time between DATE_SUB(curdate(), interval 6 month) and curdate() and month(purchasedate_time) = month(%s)'
             cursor.execute(query, (username, i))
             data = cursor.fetchone()
-            '''
             if not data['sum(sold_price)']:
                 data['sum(sold_price)'] = 0
-            '''
             monthdata.append(data)
         cursor.close()
         print(monthdata)

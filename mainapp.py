@@ -578,6 +578,69 @@ def purchaseTicketAuth():
         cursor.close()
     return redirect(url_for('customerHome'))
 
+@app.route('/customerhome/trackMySpending', methods=['GET', 'POST'])
+def trackSpendingDefault():
+    username = session['username']
+    error = None
+    try:
+        currentmonth = datetime.datetime.now().month
+        monthdata = []
+        cursor = conn.cursor()
+        query = 'select sum(sold_price) from purchase natural join ticket where email = %s and purchasedate_time between DATE_SUB(curdate(), interval 6 month) and curdate()'
+        cursor.execute(query, (username))
+        total = cursor.fetchone()
+        print(total)
+        for i in range(1, 13):#Goes in order from Jan to Dec
+            query = 'select sum(sold_price) from purchase natural join ticket where email = %s and purchasedate_time between DATE_SUB(curdate(), interval 6 month) and curdate() and month(purchasedate_time) = month(%s)'
+            cursor.execute(query, (username, i))
+            data = cursor.fetchone()
+            '''
+            if not data['sum(sold_price)']:
+                data['sum(sold_price)'] = 0
+            '''
+            monthdata.append(data)
+        cursor.close()
+        print(monthdata)
+        if not monthdata:
+            error = 'You have not made any reservations. Please purchase tickets to see your spending.'
+        most = 0
+        for x in monthdata:
+            if int(x['sum(sold_price)']) > most:
+                most = int(x)
+        print(most)
+        return render_template('trackSpending.html', error=error, results=monthdata, total=total, most=most)
+    except conn.Error as e:
+        print("Error reading data from purchase natural join ticket table", e)
+        cursor.close()
+        error = 'Invalid query: Please try again'
+        return render_template('trackSpending.html', error=error)
+
+@app.route('/customerhome/trackMySpending/results', methods=['GET', 'POST'])
+def trackSpending():
+    username = session['username']
+    start = request.form['start']
+    end = request.form['end']
+    error = None
+    try:
+        currentmonth = datetime.datetime.now().month
+        monthdata = []
+        cursor = conn.cursor()
+        query = 'select sum(sold_price) from purchase natural join ticket where email = %s and purchasedate_time between DATE_SUB(curdate(), interval 6 month) and curdate()'
+        cursor.execute(query, (username))
+        sum = cursor.fetchall()
+        for i in range(1, 13):
+            print()
+        cursor.close()
+        print(monthdata)
+        if not monthdata:
+            error = 'You have not made any reservations. Please purchase tickets to see your spending.'
+        return render_template('trackSpending.html', error=error, results=monthdata)
+    except conn.Error as e:
+        print("Error reading data from purchase natural join ticket table", e)
+        cursor.close()
+        error = 'Invalid query: Please try again'
+        return render_template('trackSpending.html', error=error)
+   
 @app.route('/logout')
 def logout():
     session.pop('username')

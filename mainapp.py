@@ -589,22 +589,30 @@ def trackSpendingDefault():
         query = 'select sum(sold_price) from purchase natural join ticket where email = %s and purchasedate_time between DATE_SUB(curdate(), interval 6 month) and curdate()'
         cursor.execute(query, (username))
         total = cursor.fetchone()
+        if not total['sum(sold_price)']:
+            total['sum(sold_price)'] = 0 #forces it from None to 0
+        total['sum(sold_price)'] = int(total['sum(sold_price)'])#forces it from string to int
         print(total)
-        for i in range(1, 13):#Goes in order from Jan to Dec
+        for i in range(1, 13): #Goes in order from Jan to Dec
             query = 'select sum(sold_price) from purchase natural join ticket where email = %s and purchasedate_time between DATE_SUB(curdate(), interval 6 month) and curdate() and month(purchasedate_time) = month(%s)'
             cursor.execute(query, (username, i))
             data = cursor.fetchone()
             if not data['sum(sold_price)']:
-                data['sum(sold_price)'] = 0
+                data['sum(sold_price)'] = 0 #forces it from None to 0
+            data['sum(sold_price)'] = int(data['sum(sold_price)'])#forces it from string to int
             monthdata.append(data)
         cursor.close()
         print(monthdata)
-        if not monthdata:
-            error = 'You have not made any reservations. Please purchase tickets to see your spending.'
-        most = 0
+        most = 0 #max spending in a month
         for x in monthdata:
             if int(x['sum(sold_price)']) > most:
-                most = int(x)
+                most = int(x['sum(sold_price)'])
+        if most == 0: #Should not ever happen since 12 appends are always being done but whatever
+            error = 'You have not made any reservations. Please purchase tickets to see your spending.'
+            most = 1
+            '''
+            All datapoints should be 0 anyway. This just prevents a divide by 0 error
+            '''
         print(most)
         return render_template('trackSpending.html', error=error, results=monthdata, total=total, most=most)
     except conn.Error as e:
@@ -612,7 +620,7 @@ def trackSpendingDefault():
         cursor.close()
         error = 'Invalid query: Please try again'
         return render_template('trackSpending.html', error=error)
-
+       
 @app.route('/customerhome/trackMySpending/results', methods=['GET', 'POST'])
 def trackSpending():
     username = session['username']

@@ -2,40 +2,59 @@
 All files and what they are used for:
 mainapp.py
 This is the main file that controls the whole webapp. It initializes the Flaskapp and the webpage on local host. It also contains all of the staff and customer functions that renders the html pages and queries the db to send data to those html pages. 
+
 addAirplane.html
 This page is used by staff to insert a new airplane (through a form) and view all airplanes operated by the staffs airline
+
 addAirport.tml
 This page is used by staff to insert a new airport into the airport database (through a form)
+
 createFlight.thml
 This page is a little misleading (it actually contains all of the info on managing flights.) It holds the forms for creating a flight, changing the status, and viewing the ratings of a specific flight. It also displays the flights occuring in the next 30 days for that staffs airline
+
 customerhome.html
+
 error.html
+
 login.html
+
 logsuccess.html
+
 purchaseTicket.html
+
 registerCust.html
 This page holds the form so the customer can fill in their info to make an account.
+
 registerStaff.html
 This page holds the form so the staff can fill in their info to make an account.
+
 search.html
 **??**
 staffhome.html
 This page contains all of the links to the mainapp.py functions to query the db and render pages to fufill all of the staff usecases (manageflights, add airport and airplanes, view revenue...)
+
 startpage.html
 This page contains all of the links to mainapp.py to view flights or to regester or login as a customer or staff
+
 topDestinations.html
 This page displays the top destinations in the last 3 months and last year for the staff's(who is logged in) airline
+
 viewCustomers.html
 This page displays the top customer in the past year for the staffs'(who is logged in) airline
+
 viewFlights.html
 viewReports.html
 This page displays a bar chart showing ticket tickets sales over the years for each month. It also has a form to input dates and see the total number of tickets sold between the two dates
+
 viewReportswDate.html
 This page is where view reports is redirected to if the date form is filledout. It displays the total number of tickets sold between those two dates
+
 viewRevenue.html
 This page displays the revenue from the past year and past 3 months for the staff's(who is logged in) airlien
+
 viewflightRatings:
 This page is where the view rating form redirects the staff. It displays all of the ratings and comments as well as average ratings for the flight that was inputed. 
+
 viewRatings.html:
 **delete this is extra**
 

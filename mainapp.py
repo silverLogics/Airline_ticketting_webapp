@@ -70,6 +70,7 @@ def customerHome():
         error = 'You have not logged in. All active users have been logged out. Begone.'
         return render_template('error.html', error=error)
     email = session['username'][0]
+    num = session['username'][1]
     try:
         cursor = conn.cursor();
         query = 'SELECT purchase.t_id, Ticket.airline_operator, ticket.flight_num FROM purchase, Ticket, Flight WHERE purchase.t_id = Ticket.t_id AND Ticket.airline_operator = Flight.airline_operator AND Ticket.flight_num = Flight.flight_num AND Flight.dept_datetime > curdate() AND purchase.email = %s'
@@ -80,7 +81,7 @@ def customerHome():
         print("Error reading data from purchase, Ticket, Flight table", e)
     finally:
         cursor.close()
-    return render_template('customerhome.html', email=email, ticketinfo=data)
+    return render_template('customerhome.html', email=email, ticketinfo=data, num=num)
       
       
 
@@ -590,7 +591,7 @@ def searchResult():
 def viewMyFlights():
     error = None
     try:
-        if session['username'][1] != 1:
+        if session['username'][1] == 1:
             error = 'You are not a customer. All active users have been logged out. Begone.'
             session.pop('username')
             return render_template('error.html', error=error)
@@ -621,7 +622,7 @@ def viewMyFlights():
 def reviewTemplate():
     error = None
     try:
-        if session['username'][1] != 1:
+        if session['username'][1] == 1:
             error = 'You are not a customer. All active users have been logged out. Begone.'
             session.pop('username')
             return render_template('error.html', error=error)
@@ -680,7 +681,7 @@ def reviewAuth():
 def purchaseTicket():
     error = None
     try:
-        if session['username'][1] != 1:
+        if session['username'][1] == 1:
             error = 'You are not a customer. All active users have been logged out. Begone.'
             session.pop('username')
             return render_template('error.html', error=error)
@@ -739,7 +740,7 @@ def purchaseTicketAuth():
 def trackSpendingDefault():
     error = None
     try:
-        if session['username'][1] != 1:
+        if session['username'][1] == 1:
             error = 'You are not a customer. All active users have been logged out. Begone.'
             session.pop('username')
             return render_template('error.html', error=error)

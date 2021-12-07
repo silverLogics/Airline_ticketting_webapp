@@ -42,10 +42,10 @@ def loginAuth():
         
         if(data):
             if usertype == 'staff':
-                session['username'] = email
+                session['username'] = (email, 1)
                 return redirect(url_for('staffHome')) #redirect to staff home page
             elif usertype == 'customer':
-                session['username'] = email
+                session['username'] = (email, 0)
                 return redirect(url_for('customerHome')) #redirect to customer home page
         else:
           error = 'Invalid login or username'
@@ -59,7 +59,17 @@ def loginAuth():
       
 @app.route('/customerHome')
 def customerHome():
-    email = session['username']
+    error = None
+    try:
+        if session['username'][1] != 0:
+            error = 'You are not a customer. All active users have been logged out. Begone.'
+            session.pop('username')
+            return render_template('error.html', error=error)
+    except KeyError as e:
+        print("Error verifying customer", e)
+        error = 'You have not logged in. All active users have been logged out. Begone.'
+        return render_template('error.html', error=error)
+    email = session['username'][0]
     try:
         cursor = conn.cursor();
         query = 'SELECT purchase.t_id, Ticket.airline_operator, ticket.flight_num FROM purchase, Ticket, Flight WHERE purchase.t_id = Ticket.t_id AND Ticket.airline_operator = Flight.airline_operator AND Ticket.flight_num = Flight.flight_num AND Flight.dept_datetime > curdate() AND purchase.email = %s'
@@ -170,12 +180,32 @@ def AuthStaff():
 
 @app.route('/staffHome')
 def staffHome():
-    username = session['username']
+    error = None
+    try:
+        if session['username'][1] != 1:
+            error = 'You are not a staff. All active users have been logged out. Begone.'
+            session.pop('username')
+            return render_template('error.html', error=error)
+    except KeyError as e:
+        print("Error verifying staff", e)
+        error = 'You have not logged in. All active users have been logged out. Begone.'
+        return render_template('error.html', error=error)
+    username = session['username'][0]
     return render_template('staffhome.html', username=username)
 
 
 @app.route('/addAirport')
 def addAirportPage():
+    error = None
+    try:
+        if session['username'][1] != 1:
+            error = 'You are not a staff. All active users have been logged out. Begone.'
+            session.pop('username')
+            return render_template('error.html', error=error)
+    except KeyError as e:
+        print("Error verifying staff", e)
+        error = 'You have not logged in. All active users have been logged out. Begone.'
+        return render_template('error.html', error=error)
     return render_template('addAirport.html')
 
 @app.route('/addAirportAuth', methods=['POST'])
@@ -197,6 +227,16 @@ def addAirport():
 
 @app.route('/addAirplane')
 def addAirplane():
+    error = None
+    try:
+        if session['username'][1] != 1:
+            error = 'You are not a staff. All active users have been logged out. Begone.'
+            session.pop('username')
+            return render_template('error.html', error=error)
+    except KeyError as e:
+        print("Error verifying staff", e)
+        error = 'You have not logged in. All active users have been logged out. Begone.'
+        return render_template('error.html', error=error)
     return render_template('addAirplane.html')
 
 @app.route('/addAirplaneAuth', methods=['POST'])
@@ -234,7 +274,16 @@ def getStaffAirline():
 @app.route('/createFlight')
 def createFlight():
     error = None
-    username = session['username']#watch for key errors! ex. if you just type the url/createFlight without logging in
+    try:
+        if session['username'][1] != 1:
+            error = 'You are not a staff. All active users have been logged out. Begone.'
+            session.pop('username')
+            return render_template('error.html', error=error)
+    except KeyError as e:
+        print("Error verifying staff", e)
+        error = 'You have not logged in. All active users have been logged out. Begone.'
+        return render_template('error.html', error=error)
+    username = session['username'][1]
     airline = getStaffAirline()
     if airline is None:
         error = 'Staff has no airline? Please log in again'
@@ -296,7 +345,17 @@ def createFlightAuth():
     
 @app.route('/changeStatus', methods=['POST'])
 def changeStatus():
-    username = session['username']
+    error = None
+    try:
+        if session['username'][1] != 1:
+            error = 'You are not a staff. All active users have been logged out. Begone.'
+            session.pop('username')
+            return render_template('error.html', error=error)
+    except KeyError as e:
+        print("Error verifying staff", e)
+        error = 'You have not logged in. All active users have been logged out. Begone.'
+        return render_template('error.html', error=error)
+    username = session['username'][1]
     cursor = conn.cursor()
     airline = getStaffAirline()
     flightnum = request.form['flight_num']
@@ -313,7 +372,17 @@ def changeStatus():
 
 @app.route('/createFlight/viewRatings', methods=['POST'])
 def viewRatings():
-    username = session['username']
+    error = None
+    try:
+        if session['username'][1] != 1:
+            error = 'You are not a staff. All active users have been logged out. Begone.'
+            session.pop('username')
+            return render_template('error.html', error=error)
+    except KeyError as e:
+        print("Error verifying staff", e)
+        error = 'You have not logged in. All active users have been logged out. Begone.'
+        return render_template('error.html', error=error)
+    username = session['username'][1]
     cursor = conn.cursor()
     flightnum = request.form['fli']
     query = 'select * from review where flight_num=%s'
@@ -334,6 +403,17 @@ def viewRatings():
     
 @app.route('/viewCustomers')
 def viewCustomers():
+    error = None
+    try:
+        if session['username'][1] != 1:
+            error = 'You are not a staff. All active users have been logged out. Begone.'
+            session.pop('username')
+            return render_template('error.html', error=error)
+    except KeyError as e:
+        print("Error verifying staff", e)
+        error = 'You have not logged in. All active users have been logged out. Begone.'
+        return render_template('error.html', error=error)
+    
     airline = getStaffAirline()
         
     cursor = conn.cursor()
@@ -351,6 +431,15 @@ def viewCustomers():
     
 @app.route('/viewReports')
 def viewReports():
+    try:
+        if session['username'][1] != 1:
+            error = 'You are not a staff. All active users have been logged out. Begone.'
+            session.pop('username')
+            return render_template('error.html', error=error)
+    except KeyError as e:
+        print("Error verifying staff", e)
+        error = 'You have not logged in. All active users have been logged out. Begone.'
+        return render_template('error.html', error=error)
 
     airline = getStaffAirline()
     currentmonth = datetime.datetime.now().month
@@ -371,6 +460,17 @@ def viewReports():
 
 @app.route('/viewReports/dates', methods=['POST'])
 def viewReportsDates():
+    error = None
+    try:
+        if session['username'][1] != 1:
+            error = 'You are not a staff. All active users have been logged out. Begone.'
+            session.pop('username')
+            return render_template('error.html', error=error)
+    except KeyError as e:
+        print("Error verifying staff", e)
+        error = 'You have not logged in. All active users have been logged out. Begone.'
+        return render_template('error.html', error=error)
+    
     airline = getStaffAirline()
     start = request.form['start']
     end = request.form['end']
@@ -386,6 +486,16 @@ def viewReportsDates():
 
 @app.route('/Revenue')
 def Revenue():
+    try:
+        if session['username'][1] != 1:
+            error = 'You are not a staff. All active users have been logged out. Begone.'
+            session.pop('username')
+            return render_template('error.html', error=error)
+    except KeyError as e:
+        print("Error verifying staff", e)
+        error = 'You have not logged in. All active users have been logged out. Begone.'
+        return render_template('error.html', error=error)
+    
     airline = getStaffAirline()
     cursor = conn.cursor()
     query = 'select sum(sold_price) as yearrev from purchase natural join ticket where airline_operator=%s and purchasedate_time between DATE_SUB(curdate(), interval 1 year) and curdate()'
@@ -399,6 +509,17 @@ def Revenue():
 
 @app.route('/topDestinations')
 def topDestinations():
+    error = None
+    try:
+        if session['username'][1] != 1:
+            error = 'You are not a staff. All active users have been logged out. Begone.'
+            session.pop('username')
+            return render_template('error.html', error=error)
+    except KeyError as e:
+        print("Error verifying staff", e)
+        error = 'You have not logged in. All active users have been logged out. Begone.'
+        return render_template('error.html', error=error)
+    
     airline = getStaffAirline()
     cursor = conn.cursor()
     query = 'select arrive_airport_id, count(t_id) from ticket NATURAL JOIN flight NATURAL JOIN purchase where airline_operator=%s and purchasedate_time between DATE_SUB(curdate(), interval 3 month) and curdate() group by arrive_airport_id'
@@ -467,8 +588,18 @@ def searchResult():
 
 @app.route('/customerhome/viewMyFlights', methods=['GET', 'POST'])
 def viewMyFlights():
-    username = session['username']
     error = None
+    try:
+        if session['username'][1] != 1:
+            error = 'You are not a customer. All active users have been logged out. Begone.'
+            session.pop('username')
+            return render_template('error.html', error=error)
+    except KeyError as e:
+        print("Error verifying customer", e)
+        error = 'You have not logged in. All active users have been logged out. Begone.'
+        return render_template('error.html', error=error)
+    username = session['username'][1]
+    
     try:
         #cursor used to send queries
         cursor = conn.cursor()
@@ -488,6 +619,16 @@ def viewMyFlights():
 
 @app.route('/customerhome/ratings')
 def reviewTemplate():
+    error = None
+    try:
+        if session['username'][1] != 1:
+            error = 'You are not a customer. All active users have been logged out. Begone.'
+            session.pop('username')
+            return render_template('error.html', error=error)
+    except KeyError as e:
+        print("Error verifying customer", e)
+        error = 'You have not logged in. All active users have been logged out. Begone.'
+        return render_template('error.html', error=error)
     return render_template('review.html')
 
 @app.route('/reviewAuth', methods=['POST'])
@@ -537,18 +678,35 @@ def reviewAuth():
 
 @app.route('/customerhome/purchaseTicket')
 def purchaseTicket():
+    error = None
+    try:
+        if session['username'][1] != 1:
+            error = 'You are not a customer. All active users have been logged out. Begone.'
+            session.pop('username')
+            return render_template('error.html', error=error)
+    except KeyError as e:
+        print("Error verifying customer", e)
+        error = 'You have not logged in. All active users have been logged out. Begone.'
+        return render_template('error.html', error=error)
     return render_template('purchaseTicket.html')
 
 @app.route('/purchaseTicketAuth', methods=['POST'])
 def purchaseTicketAuth():
     username = session['username']
-    t_id = request.form['t_id']
+    #Flight Info
+    flightnum = request.form['flightnum']
+    departdate = request.form['departdate']
+    airline_operator = request.form['airline_operator']
+    #Payment Info
     card_type = request.form['card_type']
     number = request.form['number']
     expiration = request.form['expiration']
     Cardname = request.form['Cardname']
-    try:
+    try:#incomplete
         cursor = conn.cursor()
+        query = 'select flight_num, dept_datetime, airline_operator from Flight where flight_num = %s and airline_operator = %s and month(depart_datetime) = month(%s) and day(depart_datetime) = day(%s) and year(depart_datetime) = year(%s)'
+        cursor.execute(query, (flightnum, airline_operator, departdate, departdate, departdate))
+        
         query = 'insert into purchase values (%s, %s, %s, %s, %s, now())'
         cursor.execute(query, (username, t_id, card_type, number, expiration, Cardname))
         query = 'select base_price, num_seats, S.flight_num, S.dept_datetime, S.airline_operator from ticket as S, flight as T, airplane as U where t_id = %s and S.flight_num = T.flight_num and S.dept_datetime = T.dept_datetime and S.airline_operator = T.airline_operator and T.airplane_id = U.airplane_id'
@@ -579,8 +737,18 @@ def purchaseTicketAuth():
 
 @app.route('/customerhome/trackMySpending', methods=['GET', 'POST'])
 def trackSpendingDefault():
-    username = session['username']
     error = None
+    try:
+        if session['username'][1] != 1:
+            error = 'You are not a customer. All active users have been logged out. Begone.'
+            session.pop('username')
+            return render_template('error.html', error=error)
+    except KeyError as e:
+        print("Error verifying customer", e)
+        error = 'You have not logged in. All active users have been logged out. Begone.'
+        return render_template('error.html', error=error)
+    username = session['username'][1]
+    
     try:
         currentmonth = datetime.datetime.now().month
         monthdata = []
@@ -624,7 +792,18 @@ def trackSpendingDefault():
 
 @app.route('/customerhome/trackMySpending/results', methods=['GET', 'POST'])
 def trackSpending():
-    username = session['username']
+    error = None
+    try:
+        if session['username'][1] != 1:
+            error = 'You are not a customer. All active users have been logged out. Begone.'
+            session.pop('username')
+            return render_template('error.html', error=error)
+    except KeyError as e:
+        print("Error verifying customer", e)
+        error = 'You have not logged in. All active users have been logged out. Begone.'
+        return render_template('error.html', error=error)
+    username = session['username'][1]
+    
     start = request.form['start']
     end = request.form['end']
     error = None

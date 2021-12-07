@@ -257,7 +257,7 @@ def addAirplaneAuth():
     return redirect(url_for('staffHome'))
 
 def getStaffAirline():
-    username = session['username']
+    username = session['username'][0]
     try:
         cursor = conn.cursor()
         query = 'select airline_name from Airline_staff where username = %s'

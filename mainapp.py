@@ -334,7 +334,7 @@ def createFlightAuth():
         print(lasttid,flightnum,departnum,departnum,airline_operator,numseats)
         for i in range(1, numseats):
             query = 'insert into Ticket values (%s, %s, %s, %s, %s)'
-            cursor.execute(query, (lasttid+i,flightnum,departtime,airline_operator,0))
+            cursor.execute(query, (lasttid+i,flightnum,departtime,airline_operator,None))
             conn.commit()
         
     except conn.Error as e:

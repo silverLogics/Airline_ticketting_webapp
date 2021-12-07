@@ -3,7 +3,11 @@
 <body>
 
 <form action="/purchaseTicketAuth" method="POST">
-  <input type="number" name = "t_id" placeholder="Ticket ID" required/> </br>
+  <input type="number" name = "flightnum" placeholder="Flight Number" required/> </br>
+  <input type="text" name = "airline_operator" placeholder="Airline Operator" required/> </br>
+  Departure Time </br>
+  <input type=date name = "departdate" step="1" required> </br>
+
   <input type="text" name = "card_type" placeholder="Card_Type: Credit or Debit" required/> </br>
   <input type="number" name = "number" placeholder="Card Number" required/> </br>
 

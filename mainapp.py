@@ -753,7 +753,7 @@ def purchaseTicketAuth():
     Cardname = request.form['Cardname']
     try:#incomplete
         cursor = conn.cursor()
-        query = 'select flight_num, dept_datetime, airline_operator from Flight where flight_num = %s and airline_operator = %s and month(depart_datetime) = month(%s) and day(depart_datetime) = day(%s) and year(depart_datetime) = year(%s)'
+        query = 'select flight_num, dept_datetime, airline_operator from Flight where flight_num = %s and airline_operator = %s and month(dept_datetime) = month(%s) and day(dept_datetime) = day(%s) and year(dept_datetime) = year(%s)'
         cursor.execute(query, (flightnum, airline_operator, departdate, departdate, departdate))
         
         query = 'insert into purchase values (%s, %s, %s, %s, %s, now())'

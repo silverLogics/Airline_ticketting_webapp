@@ -438,9 +438,17 @@ def viewCustomers():
         for j in range(0, n-i-1):
             if data[j]['tickets'] < data[j+1]['tickets']:
                 data[j],data[j+1]= data[j+1],data[j]
-
-    return render_template('viewCustomers.html', results=data[0:1])
-    
+    user=data[0]['email']
+    cursor = conn.cursor()
+    query = 'select * from purchase Natural Join Ticket Natural Join Flight where email=%s and date(dept_datetime) < now() and date(arrive_datetime) < now() group by t_id'
+    cursor.execute(query,(user))
+    flights=cursor.fetchall()
+    query= 'select * from Airport'
+    cursor.execute(query)
+    Airport_data=cursor.fetchall()
+    cursor.close()
+    return render_template('viewCustomers.html', results=data[0:1],flights=flights,Airports=Airport_data)
+    #return render_template('viewCustomers.html', results=data[0:1])
 @app.route('/viewReports')
 def viewReports():
     try:

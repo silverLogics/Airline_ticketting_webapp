@@ -238,7 +238,12 @@ def addAirplane():
         print("Error verifying staff", e)
         error = 'You have not logged in. All active users have been logged out. Begone.'
         return render_template('error.html', error=error)
-    return render_template('addAirplane.html')
+    airline=getStaffAirline()
+    cursor=conn.cursor()
+    query = 'Select * from airplane where airline_name = %s'
+    cursor.execute(query, (airline))
+    airplanes = cursor.fetchall()
+    return render_template('addAirplane.html', airplanes=airplanes)
 
 @app.route('/addAirplaneAuth', methods=['POST'])
 def addAirplaneAuth():

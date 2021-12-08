@@ -328,15 +328,20 @@ def createFlightAuth():
         cursor.execute(query)
         data=cursor.fetchall()
         lasttid=data[0]['max(t_id)']
+        if not lasttid:
+            lasttid = -1
         query = 'select * from airplane where airplane_id=%s'
         cursor.execute(query, airplane_num)
         data = cursor.fetchall()
         numseats=data[0]['num_seats']
         print(lasttid,flightnum,departnum,departnum,airline_operator,numseats)
         for i in range(1, numseats):
-            query = 'insert into Ticket values (%s, %s, %s, %s, %s)'
-            cursor.execute(query, (lasttid+i,flightnum,departtime,airline_operator,None))
-            conn.commit()
+            try:
+                query = 'insert into Ticket values (%s, %s, %s, %s, %s)'
+                cursor.execute(query, (lasttid+i,flightnum,departtime,airline_operator,None))
+                conn.commit()
+            except conn.Error as e:
+                print("Error inserting data into ticket table", e)
         
     except conn.Error as e:
         print("Error inserting data into flight table", e)

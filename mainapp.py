@@ -591,8 +591,8 @@ def searchResult():
     srcid = request.form['srcid']
     departtime = request.form['departtime']
     arrivetime = request.form['arrivetime']
-    print(arrivetime)
-    
+    departtime.replace('T',' ')
+    print(departtime,dstid,srcid)
     try:
         #cursor used to send queries
         cursor = conn.cursor()
@@ -607,6 +607,7 @@ def searchResult():
             cursor.execute(query, (departtime, arrivetime, srcid, dstid))
         #stores the results in a variable
         data = cursor.fetchall()
+        print("here", data)
         error = None
         if not data:
             error = 'No results met your filters to dst: Please try again'

@@ -20,6 +20,7 @@
   <input type=datetime-local name = "arrivetime" step="1"> </br>
 <!--need to specify default values!!-->
   <input type="submit" value = Submit />
+</form>
   {% if error %}
 	<p class="error"><strong>Error:</strong> {{error}}</p>
   {% endif %}
@@ -78,7 +79,7 @@
 	{% endfor %}
 	</table>
   {% endif %}
-</form>
+
 
 <a href="/">Go back</a>
 

@@ -597,18 +597,36 @@ def searchResult():
         #cursor used to send queries
         cursor = conn.cursor()
         #query = 'select flight_num, airline_operator, dept_datetime, arrive_datetime, base_price, status from flight,airport as S, airport as D where date(dept_datetime) <= %s and date(arrive_datetime) <= %s and %s = S.name and %s = D.name and %s = S.city and %s = D.city and dept_airport_id = S.airport_id and arrive_airport_id = D.airport_id'
-        if arrivetime == '':
-            query = 'select flight_num, airline_operator, dept_datetime, arrive_datetime, base_price, status from flight,airport as S, airport as D where date(dept_datetime) <= %s and dept_airport_id = %s and arrive_airport_id = %s and dept_airport_id = S.airport_id and arrive_airport_id = D.airport_id'
+        if arrivetime == '': #1 way
+            print('1way')
+            query = 'select flight_num, airline_operator, dept_datetime, arrive_datetime, base_price, status from flight,airport as S, airport as D where dept_datetime > now() and date(dept_datetime) <= %s and dept_airport_id = %s and arrive_airport_id = %s and dept_airport_id = S.airport_id and arrive_airport_id = D.airport_id group by dept_datetime'
             cursor.execute(query, (departtime, srcid, dstid))
-        else:
-            query = 'select flight_num, airline_operator, dept_datetime, arrive_datetime, base_price, status from flight,airport as S, airport as D where date(dept_datetime) <= %s and date(arrive_datetime) <= %s and dept_airport_id = %s and arrive_airport_id = %s and dept_airport_id = S.airport_id and arrive_airport_id = D.airport_id'
+        else: #2 way, list of flights to dst
+            print('2way')
+            query = 'select flight_num, airline_operator, dept_datetime, arrive_datetime, base_price, status from flight,airport as S, airport as D where dept_datetime > now() and date(dept_datetime) <= %s and date(arrive_datetime) <= %s and dept_airport_id = %s and arrive_airport_id = %s and dept_airport_id = S.airport_id and arrive_airport_id = D.airport_id group by dept_datetime'
             cursor.execute(query, (departtime, arrivetime, srcid, dstid))
         #stores the results in a variable
         data = cursor.fetchall()
-        cursor.close()
         error = None
         if not data:
-            error = 'No results met your filters: Please try again'
+            error = 'No results met your filters to dst: Please try again'
+        if arrivetime != '': #2 way, list of possible return flights
+            try:
+                #Searches for ANY POSSIBLE FLIGHT DURING THE TIME FRAME. TIMEFRAME IS NOT CALCULATED BASED ON PREVIOUSLY CALCULATED FLIGHTS TO THE DST
+                query = 'select flight_num, airline_operator, dept_datetime, arrive_datetime, base_price, status from flight,airport as S, airport as D where dept_datetime > now() and date(dept_datetime) <= %s and date(arrive_datetime) <= %s and dept_airport_id = %s and arrive_airport_id = %s and dept_airport_id = S.airport_id and arrive_airport_id = D.airport_id group by dept_datetime'
+                cursor.execute(query, (departtime, arrivetime, dstid, srcid)) #switched for the way back
+                data2 = cursor.fetchall()
+                cursor.close()
+                if not data2:
+                    print('No results met your filters back to src: Please try again')
+                    error2 = 'No results met your filters back to src: Please try again'
+                return render_template('search.html', error=error, error2=error2, results=data, twoway=data2)
+            except conn.Error as e:
+                print("Error reading data from flight,airport as S, airport as D table", e)
+                cursor.close()
+                error = 'Invalid search filters: Please try again'
+                return render_template('search.html', error=error)
+        cursor.close()
         return render_template('search.html', error=error, results=data)
     except conn.Error as e:
         print("Error reading data from flight,airport as S, airport as D table", e)

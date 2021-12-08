@@ -300,7 +300,8 @@ def createFlight():
     cursor.execute(query, (airline))
     availableairplane = cursor.fetchall()
 
-    query = 'select flight_num, dept_datetime, status from flight where airline_operator = %s'
+    #query = 'select flight_num, dept_datetime, status from flight where airline_operator = %s'
+    query = 'select * from flight where airline_operator = %s and ((dept_datetime between curdate() and date_add(curdate(), interval 30 day)) or (arrive_datetime between curdate() and date_add(curdate(), interval 30 day)))'
     cursor.execute(query, (airline))
     futureFlights = cursor.fetchall()
     

@@ -755,7 +755,7 @@ def purchaseTicketAuth():
         cursor = conn.cursor()
         query = 'select flight_num, dept_datetime, airline_operator from Flight where flight_num = %s and airline_operator = %s and month(dept_datetime) = month(%s) and day(dept_datetime) = day(%s) and year(dept_datetime) = year(%s)'
         cursor.execute(query, (flightnum, airline_operator, departdate, departdate, departdate))
-        
+        #YOU DONT SAY WHAT TID IS
         query = 'insert into purchase values (%s, %s, %s, %s, %s, now())'
         cursor.execute(query, (username, t_id, card_type, number, expiration, Cardname))
         query = 'select base_price, num_seats, S.flight_num, S.dept_datetime, S.airline_operator from ticket as S, flight as T, airplane as U where t_id = %s and S.flight_num = T.flight_num and S.dept_datetime = T.dept_datetime and S.airline_operator = T.airline_operator and T.airplane_id = U.airplane_id'

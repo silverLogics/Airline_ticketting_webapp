@@ -584,8 +584,8 @@ def searchResult():
         cursor = conn.cursor()
         #query = 'select flight_num, airline_operator, dept_datetime, arrive_datetime, base_price, status from flight,airport as S, airport as D where date(dept_datetime) <= %s and date(arrive_datetime) <= %s and %s = S.name and %s = D.name and %s = S.city and %s = D.city and dept_airport_id = S.airport_id and arrive_airport_id = D.airport_id'
         if arrivetime == '':
-            query = 'select flight_num, airline_operator, dept_datetime, arrive_datetime, base_price, status from flight,airport as S, airport as D where date(dept_datetime) <= %s and date(arrive_datetime) <= %s and dept_airport_id = %s and dept_airport_id = S.airport_id and arrive_airport_id = D.airport_id'
-            cursor.execute(query, (departtime, arrivetime, srcid))
+            query = 'select flight_num, airline_operator, dept_datetime, arrive_datetime, base_price, status from flight,airport as S, airport as D where date(dept_datetime) <= %s and dept_airport_id = %s and arrive_airport_id = %s and dept_airport_id = S.airport_id and arrive_airport_id = D.airport_id'
+            cursor.execute(query, (departtime, srcid, dstid))
         else:
             query = 'select flight_num, airline_operator, dept_datetime, arrive_datetime, base_price, status from flight,airport as S, airport as D where date(dept_datetime) <= %s and date(arrive_datetime) <= %s and dept_airport_id = %s and arrive_airport_id = %s and dept_airport_id = S.airport_id and arrive_airport_id = D.airport_id'
             cursor.execute(query, (departtime, arrivetime, srcid, dstid))

@@ -813,11 +813,54 @@ def purchaseTicketAuth():
     Cardname = request.form['Cardname']
     try:#incomplete
         cursor = conn.cursor()
+        #Range of flights on that date
         query = 'select flight_num, dept_datetime, airline_operator from Flight where flight_num = %s and airline_operator = %s and month(dept_datetime) = month(%s) and day(dept_datetime) = day(%s) and year(dept_datetime) = year(%s)'
-        cursor.execute(query, (flightnum, airline_operator, departdate, departdate, departdate))
+        cursor.execute(query, (flightnum, airline_operator, departdate, departdate, departdate))        
+        data = cursor.fetchall()
+        session['fnum'] = flightnum
+        session['operator'] = airline_operator
+        session['card'] = card_type
+        session['c_num'] = number
+        session['expiration'] = expiration
+        session['c_name'] = Cardname
+        return render_template('purchaseTicketFlight.html', results=data)
+    except conn.Error as e:
+        print("Error reading data from flight table", e)
+        cursor.close()
+    finally:
+        cursor.close()
+    return redirect(url_for('customerHome'))
+
+@app.route('/purchaseTicketAuth2', methods=['POST'])
+def purchaseTicketAuth2():
+    username = session['username']
+    try:
+        flightnum = session['f_num']
+        airline_operator = session['operator']
+        card_type = session['card']
+        number = session['c_num']
+        expiration = session['expiration']
+        Cardname = session['c_name']
+    except:
+        print("Error reading previous data of ticket purchase", e)
+        error='Error reading previous data of ticket purchase'
+        return render_template('purchaseTicket.html', error=error)
+    #Flight Info
+    departtime = request.form['departtime']
+    try:
+        cursor = conn.cursor()
         #YOU DONT SAY WHAT TID IS
+        query = 'select t_id from ticket where flight_num = %s and dept_datetime = %s and airline_operator = %s and sold_price is NULL'
+        cursor.execute(query, (flightnum, departtime, airline_operator))
+        data = cursor.fetchone()
+        if not data:
+            error='All tickets of that flight are sold out. Please select another flight'
+            cursor.close()
+            return render_template('purchaseTicket.html', error=error)
+        t_id = data
         query = 'insert into purchase values (%s, %s, %s, %s, %s, now())'
         cursor.execute(query, (username, t_id, card_type, number, expiration, Cardname))
+        #find which price you need to pay
         query = 'select base_price, num_seats, S.flight_num, S.dept_datetime, S.airline_operator from ticket as S, flight as T, airplane as U where t_id = %s and S.flight_num = T.flight_num and S.dept_datetime = T.dept_datetime and S.airline_operator = T.airline_operator and T.airplane_id = U.airplane_id'
         cursor.execute(query, (t_id))
         data = cursor.fetchone()
@@ -842,7 +885,10 @@ def purchaseTicketAuth():
         cursor.close()
     finally:
         cursor.close()
-    return redirect(url_for('customerHome'))
+    error = 'You have purchased a ticket t_id: '
+    error += t_id
+    error += 'However, you should really buy more tickets please.'
+    return render_template('purchaseTicket.html', error=error)
 
 @app.route('/customerhome/trackMySpending', methods=['GET', 'POST'])
 def trackSpendingDefault():

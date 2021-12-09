@@ -842,7 +842,7 @@ def purchaseTicketAuth2():
         expiration = session['expiration']
         Cardname = session['c_name']
     except:
-        print("Error reading previous data of ticket purchase", e)
+        print("Error reading previous data of ticket purchase")
         error='Error reading previous data of ticket purchase'
         return render_template('purchaseTicket.html', error=error)
     #Flight Info

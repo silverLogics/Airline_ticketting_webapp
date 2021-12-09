@@ -847,7 +847,6 @@ def purchaseTicketAuth2():
         return render_template('purchaseTicket.html', error=error)
     #Flight Info
     departtime = request.form['departtime']
-    departtime.replace('T',' ')
     try:
         cursor = conn.cursor()
         #YOU DONT SAY WHAT TID IS
@@ -856,7 +855,6 @@ def purchaseTicketAuth2():
         data = cursor.fetchone()
         '''
         print(data)
-        
         print(flightnum)
         print(airline_operator)
         print(card_type)
@@ -875,8 +873,8 @@ def purchaseTicketAuth2():
                 error = 'All tickets of that flight are sold out. Please select another flight'
             cursor.close()
             return render_template('purchaseTicket.html', error=error)
-        t_id = data
-        query = 'insert into purchase values (%s, %s, %s, %s, %s, now())'
+        t_id = data['t_id']
+        query = 'insert into purchase values (%s, %s, %s, %s, %s, %s, now())'
         cursor.execute(query, (username, t_id, card_type, number, expiration, Cardname))
         #find which price you need to pay
         query = 'select base_price, num_seats, S.flight_num, S.dept_date time, S.airline_operator from ticket as S, flight as T, airplane as U where t_id = %s and S.flight_num = T.flight_num and S.dept_datetime = T.dept_datetime and S.airline_operator = T.airline_operator and T.airplane_id = U.airplane_id'
@@ -903,10 +901,10 @@ def purchaseTicketAuth2():
         cursor.close()
     finally:
         cursor.close()
-    error = 'You have purchased a ticket t_id: '
-    error += t_id
-    error += 'However, you should really buy more tickets please.'
-    return render_template('purchaseTicket.html', error=error)
+    confirm = 'You have purchased a ticket t_id: '
+    confirm += str(t_id)
+    confirm += '. However, you should really buy more tickets please. We totally have no ulterior motives relating to capitalism.'
+    return render_template('purchaseTicket.html', confirm=confirm)
 
 @app.route('/customerhome/trackMySpending', methods=['GET', 'POST'])
 def trackSpendingDefault():

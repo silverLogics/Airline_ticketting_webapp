@@ -887,7 +887,7 @@ def purchaseTicketAuth2():
         flight_num = data["flight_num"]
         dept_datetime = data["dept_datetime"]
         airline_operator = data["airline_operator"]
-        query = 'select count(*) from ticket as S, flight as T where S.flight_num = T.flight_num and S.dept_datetime = T.dept_datetime and S.airline_operator = T.airline_operator and S.flight_num = %s and S.dept_datetime = %s and S.airline_operator = %s'
+        query = 'select count(*) from ticket as S, flight as T where S.flight_num = T.flight_num and S.dept_datetime = T.dept_datetime and S.airline_operator = T.airline_operator and S.flight_num = %s and S.dept_datetime = %s and S.airline_operator = %s and S.sold_price is NULL'
         cursor.execute(query, (flight_num, dept_datetime, airline_operator))
         data = cursor.fetchone()
         if data["count(*)"] < (0.75 * capacity):

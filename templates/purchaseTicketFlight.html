@@ -2,46 +2,29 @@
 
 <body>
 
-<h1> Search Filters </h1>
+<form action="/purchaseTicketAuth" method="POST">
+  <input type="number" name = "flightnum" placeholder="Flight Number" required/> </br>
+  <input type="text" name = "airline_operator" placeholder="Airline Operator" required/> </br>
+  Departure Time </br>
+  <input type=date name = "departdate" step="1" required> </br>
 
-<form action="/purchaseTicketAuth2" method="POST">
-  {% if results %}
-	<h4> Query Results To Destination Airport based on Day </h4>
-	<style type="text/css">
-		table, th, td{
-			border: 1px solid black;
-		}
-	</style>
-	<table>
-		<th>Flight Number</th>
-		<th>Airline Operator</th>
-		<th>Departure Time</th>
-		<th>Arrival Time</th>
-		<th>Base Price</th>
-		<th>Status</th>
-	{% for line in results %}
-		<tr>
-			<td>{{line['flight_num']}}</td>
-			<td>{{line['airline_operator']}}</td>
-			<td>{{line['dept_datetime']}}</td>
-			<td>{{line['arrive_datetime']}}</td>
-			<td>{{line['base_price']}}</td>
-			<td>{{line['status']}}</td>
-		</tr>
-	{% endfor %}
-	</table>
-  {% endif %}
+  <input type="text" name = "card_type" placeholder="Card_Type: Credit or Debit" required/> </br>
+  <input type="number" name = "number" placeholder="Card Number" required/> </br>
 
-  Please Specify Exact Flight Departure Time </br>
-  <input type=datetime-local name = "departtime" step="1" required> </br>
+  Expiration Date </br>
+  <input type=date name = "expiration" step="1" required> </br>
 
+  <input type="text" name = "Cardname" placeholder="Card Name" required/> </br>
   <input type="submit" value = Submit />
 
   {% if error %}
 	<p class="error"><strong>Error:</strong> {{error}}</p>
   {% endif %}
+  {% if confirm %}
+	<h4>{{confirm}}</h4>
+  {% endif %}
 
-<a href="/customerHome">Go back to customer home</a>
+<a href="/customerHome">Go back</a>
 
 </body>
 

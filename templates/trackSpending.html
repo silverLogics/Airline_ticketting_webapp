@@ -80,6 +80,10 @@ Does simple animation on graph bars
 
 {% if total %}
 
+{% if yeartotal %}
+<h4>Year Total Spent: {{yeartotal[sum(sold_price)]}}</h4>
+<h4>Monthly</h4>
+{% endif %}
 <h4>Total: {{total['sum(sold_price)']}}</h4>
 <h4>Most Monthly Expenditure: {{most}}</h4>
 <h5>If the above was -1, you have not spent during the specified period</h5>

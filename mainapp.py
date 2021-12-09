@@ -926,6 +926,12 @@ def trackSpendingDefault():
         currentmonth = datetime.datetime.now().month
         monthdata = []
         cursor = conn.cursor()
+        #Default sum
+        query = 'select sum(sold_price) from purchase natural join ticket where email = %s and purchasedate_time between DATE_SUB(curdate(), interval 1 year) and curdate()'
+        cursor.execute(query, (username))
+        yeartotal = cursor.fetchone()
+        if not yeartotal['sum(sold_price)']:
+            yeartotal['sum(sold_price)'] = 0 #forces it from None to 0
         query = 'select sum(sold_price) from purchase natural join ticket where email = %s and purchasedate_time between DATE_SUB(curdate(), interval 6 month) and curdate()'
         cursor.execute(query, (username))
         total = cursor.fetchone()

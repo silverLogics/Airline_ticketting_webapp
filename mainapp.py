@@ -835,7 +835,7 @@ def purchaseTicketAuth():
 def purchaseTicketAuth2():
     username = session['username']
     try:
-        flightnum = session['f_num']
+        flightnum = session['fnum']
         airline_operator = session['operator']
         card_type = session['card']
         number = session['c_num']

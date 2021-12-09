@@ -874,21 +874,23 @@ def purchaseTicketAuth2():
             cursor.close()
             return render_template('purchaseTicket.html', error=error)
         t_id = data['t_id']
-        query = 'insert into purchase values (%s, %s, %s, %s, %s, %s, now())'
-        cursor.execute(query, (username, t_id, card_type, number, expiration, Cardname))
+        print(username,t_id,card_type,number,expiration,Cardname)
+        query = 'insert into purchase values (%s, %s, %s, %s, %s, %s, now());'
+        cursor.execute(query, (username[0], t_id, card_type, number, expiration, Cardname))
         #find which price you need to pay
-        query = 'select base_price, num_seats, S.flight_num, S.dept_date time, S.airline_operator from ticket as S, flight as T, airplane as U where t_id = %s and S.flight_num = T.flight_num and S.dept_datetime = T.dept_datetime and S.airline_operator = T.airline_operator and T.airplane_id = U.airplane_id'
+        query = 'select base_price, num_seats, S.flight_num, S.dept_datetime, S.airline_operator from ticket as S, flight as T, airplane as U where t_id = %s and S.flight_num = T.flight_num and S.dept_datetime = T.dept_datetime and S.airline_operator = T.airline_operator and T.airplane_id = U.airplane_id'
         cursor.execute(query, (t_id))
         data = cursor.fetchone()
-        base = data[base_price]
-        capacity = data[num_seats]
-        flight_num = data[flight_num]
-        dept_datetime = data[dept_datetime]
-        airline_operator = data[airline_operator]
+        print(data)
+        base = data["base_price"]
+        capacity = data["num_seats"]
+        flight_num = data["flight_num"]
+        dept_datetime = data["dept_datetime"]
+        airline_operator = data["airline_operator"]
         query = 'select count(*) from ticket as S, flight as T where S.flight_num = T.flight_num and S.dept_datetime = T.dept_datetime and S.airline_operator = T.airline_operator and S.flight_num = %s and S.dept_datetime = %s and S.airline_operator = %s'
         cursor.execute(query, (flight_num, dept_datetime, airline_operator))
         data = cursor.fetchone()
-        if data < (0.75 * capacity):
+        if data["count(*)"] < (0.75 * capacity):
             query = 'update ticket set sold_price = %s where t_id = %s'
             cursor.execute(query, (base, t_id))
         else:

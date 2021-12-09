@@ -841,27 +841,45 @@ def purchaseTicketAuth2():
         number = session['c_num']
         expiration = session['expiration']
         Cardname = session['c_name']
-    except:
-        print("Error reading previous data of ticket purchase")
+    except KeyError as e:
+        print("Error reading previous data of ticket purchase", e)
         error='Error reading previous data of ticket purchase'
         return render_template('purchaseTicket.html', error=error)
     #Flight Info
     departtime = request.form['departtime']
+    departtime.replace('T',' ')
     try:
         cursor = conn.cursor()
         #YOU DONT SAY WHAT TID IS
         query = 'select t_id from ticket where flight_num = %s and dept_datetime = %s and airline_operator = %s and sold_price is NULL'
         cursor.execute(query, (flightnum, departtime, airline_operator))
         data = cursor.fetchone()
+        '''
+        print(data)
+        
+        print(flightnum)
+        print(airline_operator)
+        print(card_type)
+        print(number)
+        print(expiration)
+        print(Cardname)
+        print(departtime)
+        '''
         if not data:
-            error='All tickets of that flight are sold out. Please select another flight'
+            query = 'select t_id from ticket where flight_num = %s and dept_datetime = %s and airline_operator = %s'
+            cursor.execute(query, (flightnum, departtime, airline_operator))
+            data = cursor.fetchone()
+            if not data:
+                error = 'Your specified datetime was incorrect. Please try again'
+            else:
+                error = 'All tickets of that flight are sold out. Please select another flight'
             cursor.close()
             return render_template('purchaseTicket.html', error=error)
         t_id = data
         query = 'insert into purchase values (%s, %s, %s, %s, %s, now())'
         cursor.execute(query, (username, t_id, card_type, number, expiration, Cardname))
         #find which price you need to pay
-        query = 'select base_price, num_seats, S.flight_num, S.dept_datetime, S.airline_operator from ticket as S, flight as T, airplane as U where t_id = %s and S.flight_num = T.flight_num and S.dept_datetime = T.dept_datetime and S.airline_operator = T.airline_operator and T.airplane_id = U.airplane_id'
+        query = 'select base_price, num_seats, S.flight_num, S.dept_date time, S.airline_operator from ticket as S, flight as T, airplane as U where t_id = %s and S.flight_num = T.flight_num and S.dept_datetime = T.dept_datetime and S.airline_operator = T.airline_operator and T.airplane_id = U.airplane_id'
         cursor.execute(query, (t_id))
         data = cursor.fetchone()
         base = data[base_price]

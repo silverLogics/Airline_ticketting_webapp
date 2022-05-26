@@ -1,0 +1,57 @@
+<html>
+<head>
+</head>
+<body>
+
+<h2>Best Customer</h2>
+<style type="text/css">
+	table, th, td{
+		border: 1px solid black;
+	}
+</style>
+<form action="/viewCustomers" method="POST">
+<table>
+	<th>customer email</th>
+	<th>tickets purchased (within past year)</th>
+
+{% for line in results %}
+	<tr>
+		<td>{{line.email}}</td>
+		<td>{{line.tickets}}</td>
+	</tr>
+{% endfor %}
+</table>
+
+<h3>All of this {{results[0]['email']}} flights ever taken on {{flights[0]['airline_operator']}}:</h3>
+<table>
+	<th>tickets</th>
+	<th>date</th>
+	<th>from</th>
+	<th>to</th>
+
+{% for flight in flights %}
+	<tr>
+		<td>{{flight.t_id}}</td>
+		<td>{{flight.dept_datetime}}</td>
+		{%for airport in Airports%}
+			{%if flight.dept_airport_id == airport.airport_id%}
+				<td>{{airport.name}}</td>
+			{%endif%}
+		{%endfor%}
+		{%for airport in Airports%}
+			{%if flight.arrive_airport_id == airport.airport_id%}
+				<td>{{airport.name}}</td>
+			{%endif%}
+		{%endfor%}
+	</tr>
+{% endfor %}
+
+</table>
+</form>
+</br></br>
+<a href="/staffHome">Return</a>
+
+</body>
+
+
+</html>

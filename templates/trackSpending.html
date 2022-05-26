@@ -1,0 +1,155 @@
+<html>
+<head>
+<style>
+/*
+Citation for Open Source Graph Template
+https://speckyboy.com/code-snippets-css3-bar-graphs/
+No. 4 Minimalist Chart
+The css and html graph code was sourced from the above 
+and modified to fit what we wanted our data to show (axis and labels)
+Permission for using open source graph templates was granted by Prof. Ratan Dey
+*/
+body {
+  font: 12px/1.2 'Lucida Grande',sans-serif;
+  color: #666;
+}
+
+.chart {
+  display: table;
+  table-layout: fixed;
+  width: 1000%;
+  max-width: 1000px;
+  height: 200px;
+  margin: 0 auto;
+  background-image: linear-gradient(to top, rgba(0, 0, 0, 0.1) 2%, rgba(0, 0, 0, 0) 2%);
+  background-size: 100% 50px;
+  background-position: left top;
+}
+
+/*
+*/
+.chart li {
+  position: relative;
+  display: table-cell;
+  vertical-align: bottom;
+  height: 200px;
+}
+
+/*
+The bars
+*/
+.chart span {
+  margin: 0 1em;
+  display: block;
+  background: rgba(209, 236, 250, 0.75);
+  animation: draw 1s ease-in-out;
+}
+
+/*
+The x-axis labels
+*/
+.chart span:before {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  padding: 1px 1em 0;
+  display: block;
+  text-align: center;
+  content: attr(title);
+  word-wrap: break-word;
+}
+
+/*
+Does simple animation on graph bars
+*/
+@keyframes draw {
+  0% {
+    height: 0;
+  }
+}
+
+
+</style>
+</head>
+
+<body>
+
+<h2>Track My Spending</h2>
+<h4>By month</h4>
+
+{% if total %}
+
+{% if yeartotal %}
+<h4>Year Total Spent: {{yeartotal[sum(sold_price)]}}</h4>
+<h4>Monthly</h4>
+{% endif %}
+<h4>Total: {{total['sum(sold_price)']}}</h4>
+<h4>Most Monthly Expenditure: {{most}}</h4>
+<h5>If the above was -1, you have not spent during the specified period</h5>
+
+{% endif %}
+
+{% if results and most %}
+
+<ul class="chart">
+  <li>
+    <span style="height:{{results[0]['sum(sold_price)'] / most * 100}}%" title="January"></span>
+  </li>
+  <li>
+    <span style="height:{{results[1]['sum(sold_price)'] / most * 100}}%" title="February"></span>
+  </li>
+  <li>
+    <span style="height:{{results[2]['sum(sold_price)'] / most * 100}}%" title="March"></span>
+  </li>
+  <li>
+    <span style="height:{{results[3]['sum(sold_price)'] / most * 100}}%" title="April"></span>
+  </li>
+  <li>
+    <span style="height:{{results[4]['sum(sold_price)'] / most * 100}}%" title="May"></span>
+  </li>
+  <li>
+    <span style="height:{{results[5]['sum(sold_price)'] / most * 100}}%" title="June"></span>
+  </li>
+  <li>
+    <span style="height:{{results[6]['sum(sold_price)'] / most * 100}}%" title="July"></span>
+  </li>
+  <li>
+    <span style="height:{{results[7]['sum(sold_price)'] / most * 100}}%" title="August"></span>
+  </li>
+  <li>
+    <span style="height:{{results[8]['sum(sold_price)'] / most * 100}}%" title="September"></span>
+  </li>
+  <li>
+    <span style="height:{{results[9]['sum(sold_price)'] / most * 100}}%" title="October"></span>
+  </li>
+  <li>
+    <span style="height:{{results[10]['sum(sold_price)'] / most * 100}}%" title="November"></span>
+  </li>
+  <li>
+    <span style="height:{{results[11]['sum(sold_price)'] / most * 100}}%" title="December"></span>
+  </li>
+</ul>    
+
+{% endif %}
+
+<h4></h4>
+
+<form action="/trackSpending" method="POST">
+    Starting Time:
+    <input type="datetime-local" name="start" required/> </br>
+    Ending Time:
+    <input type="datetime-local" name="end" required/> </br>
+    <input type="submit" value = Search />
+</form>
+
+
+{% if error %}
+	<p class="error"><strong>Error:</strong> {{error}}</p>
+{% endif %}
+
+<a href="/customerHome">Go back</a>
+
+</body>
+
+</html>

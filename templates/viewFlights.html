@@ -1,0 +1,42 @@
+<html>
+
+<body>
+
+<h1> View My Flights </h1>
+
+<form action="/searchResult" method="POST">
+  {% if error %}
+	<p class="error"><strong>Error:</strong> {{error}}</p>
+  {% endif %}
+  {% if results %}
+	<h4> Query Results </h4>
+	<style type="text/css">
+		table, th, td{
+			border: 1px solid black;
+		}
+	</style>
+	<table>
+		<th>Ticket ID</th>
+		<th>Flight Number</th>
+		<th>Departure Time</th>
+		<th>Airline Operator</th>
+		<th>Sold Price</th>
+	{% for line in results %}
+		<tr>
+			<td>{{line['ticket.t_id']}}</td>
+			<td>{{line['flight_num']}}</td>
+			<td>{{line['dept_datetime']}}</td>
+			<td>{{line['airline_operator']}}</td>
+			<td>{{line['sold_price']}}</td>
+		</tr>
+	{% endfor %}
+	</table>
+  {% endif %}
+</form>
+
+<a href="/customerHome">Go back</a>
+
+</body>
+
+
+</html>

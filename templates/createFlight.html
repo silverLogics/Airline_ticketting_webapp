@@ -27,7 +27,7 @@
 
 <form action="/changeStatus" method="POST">
   <input type="text" name = "flight_num" placeholder="Flight Number" required/> </br>
-  <input type="radio" name="status" value="Upcoming"> on-time
+  <input type="radio" name="status" value="on-time"> on-time
   <input type="radio" name="status" value="Delayed"> delayed
   <input type="submit" value = Update />
 
@@ -35,12 +35,13 @@
 
 <h3>View Ratings</h3>
 
-<form action="/viewRatings" method="POST">
-  <input type="text" name = "flightnum" placeholder="Flight Number" required/> </br>
-  <input type="submit" value = view />
+<form action="/createFlight/viewRatings" method="POST">
+  flight num</br>
+  <input type="text" name = "fli" required/> </br>
+  <input type="submit" value="Search"/>
 </form>
 
-<h4> Future Flights by Your Airline Departing in 30 days </h4>
+<h4> Future Flights </h4>
 <style type="text/css">
 	table, th, td{
 		border: 1px solid black;

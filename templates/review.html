@@ -1,0 +1,24 @@
+<html>
+
+<body>
+<h1>Customer Review</h1>
+<form action="/reviewAuth" method="POST">
+  <input type="number" name = "flight_num" placeholder="Flight Number" required/> </br>
+  Departure Date </br>
+  <input type=datetime-local name = "dept_datetime" step="1" required> </br>
+  <input type="text" name = "airline_operator" placeholder="Airline Operator" required/> </br>
+  <input type="number" name = "rating" placeholder="Rating out of 5" required/> </br>
+  <input type="text" name = "comment" placeholder="Comment" required/> </br>
+
+  <input type="submit" value = Submit />
+
+{% if error %}
+	<p class="error"><strong>Error:</strong> {{error}}</p>
+{% endif %}
+
+<a href="/customerHome">Go back</a>
+
+</body>
+
+
+</html>

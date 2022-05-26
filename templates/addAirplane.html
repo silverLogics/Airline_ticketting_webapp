@@ -11,7 +11,22 @@
 
   <input type="submit" value = Submit />
 </form>
-
+<h3>All currently owned airplanes</h3>
+<style type="text/css">
+	table, th, td{
+		border: 1px solid black;
+	}
+</style>
+<table>
+	<th>id</th>
+	<th>numseats</th>
+{%for airplane in airplanes%}
+<tr>
+  <td>{{airplane['airplane_id']}}</td>
+  <td>{{airplane['num_seats']}}</td>
+</tr>
+{%endfor%}
+</table>
 <a href="/staffHome">Return to home</a>
 
 </body>

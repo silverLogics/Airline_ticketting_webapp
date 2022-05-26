@@ -1,0 +1,32 @@
+<html>
+
+<body>
+
+<form action="/purchaseTicketAuth" method="POST">
+  <input type="number" name = "flightnum" placeholder="Flight Number" required/> </br>
+  <input type="text" name = "airline_operator" placeholder="Airline Operator" required/> </br>
+  Departure Time </br>
+  <input type=date name = "departdate" step="1" required> </br>
+
+  <input type="text" name = "card_type" placeholder="Card_Type: Credit or Debit" required/> </br>
+  <input type="number" name = "number" placeholder="Card Number" required/> </br>
+
+  Expiration Date </br>
+  <input type=date name = "expiration" step="1" required> </br>
+
+  <input type="text" name = "Cardname" placeholder="Card Name" required/> </br>
+  <input type="submit" value = Submit />
+
+  {% if error %}
+	<p class="error"><strong>Error:</strong> {{error}}</p>
+  {% endif %}
+  {% if confirm %}
+	<h4>{{confirm}}</h4>
+  {% endif %}
+
+<a href="/customerHome">Go back</a>
+
+</body>
+
+
+</html>

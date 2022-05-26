@@ -1,0 +1,27 @@
+<html>
+<body>
+<h3>top three destinations over the past 3 months</h3>
+<table>
+	<th>city</th>
+
+{% for line in monthdata %}
+	<tr>
+		<td>{{line['city']}}</td>
+	</tr>
+{% endfor %}
+</table>
+<h3>top three destinations over the past year</h3>
+<table>
+	<th>city</th>
+
+{% for entry in yeardata %}
+	<tr>
+		<td>{{entry['city']}}</td>
+	</tr>
+{% endfor %}
+</table>
+
+<a href="/staffHome">return</a>
+
+</body>
+</html>
